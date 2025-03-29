@@ -1,4 +1,3 @@
-```markdown
 # EduConnect
 
 ## Informations Générales
@@ -119,4 +118,3 @@ EduConnect vise à résoudre ces problèmes en offrant une plateforme intégrée
 [X] Important - Haute valeur ajoutée  
 [ ] Souhaitable - Bon potentiel mais peut attendre  
 [ ] Expérimental - À explorer si les ressources le permettent
-```
