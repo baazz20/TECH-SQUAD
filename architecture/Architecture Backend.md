@@ -1,553 +1,1068 @@
-### Architecture Backend et Infrastructure pour EduConnect
+# Architecture Backend et Infrastructure pour EduConnect
 
 Voici une proposition d'architecture backend et d'infrastructure complète pour la plateforme EduConnect.
 
 ## Architecture Backend
 
 ```mermaid
-Architecture Backend EduConnect.download-icon {
-            cursor: pointer;
-            transform-origin: center;
-        }
-        .download-icon .arrow-part {
-            transition: transform 0.35s cubic-bezier(0.35, 0.2, 0.14, 0.95);
-             transform-origin: center;
-        }
-        button:has(.download-icon):hover .download-icon .arrow-part, button:has(.download-icon):focus-visible .download-icon .arrow-part {
-          transform: translateY(-1.5px);
-        }
-        #mermaid-diagram-r2m9t{font-family:var(--font-geist-sans);font-size:12px;fill:#000000;}#mermaid-diagram-r2m9t .error-icon{fill:#552222;}#mermaid-diagram-r2m9t .error-text{fill:#552222;stroke:#552222;}#mermaid-diagram-r2m9t .edge-thickness-normal{stroke-width:1px;}#mermaid-diagram-r2m9t .edge-thickness-thick{stroke-width:3.5px;}#mermaid-diagram-r2m9t .edge-pattern-solid{stroke-dasharray:0;}#mermaid-diagram-r2m9t .edge-thickness-invisible{stroke-width:0;fill:none;}#mermaid-diagram-r2m9t .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-diagram-r2m9t .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-diagram-r2m9t .marker{fill:#666;stroke:#666;}#mermaid-diagram-r2m9t .marker.cross{stroke:#666;}#mermaid-diagram-r2m9t svg{font-family:var(--font-geist-sans);font-size:12px;}#mermaid-diagram-r2m9t p{margin:0;}#mermaid-diagram-r2m9t .label{font-family:var(--font-geist-sans);color:#000000;}#mermaid-diagram-r2m9t .cluster-label text{fill:#333;}#mermaid-diagram-r2m9t .cluster-label span{color:#333;}#mermaid-diagram-r2m9t .cluster-label span p{background-color:transparent;}#mermaid-diagram-r2m9t .label text,#mermaid-diagram-r2m9t span{fill:#000000;color:#000000;}#mermaid-diagram-r2m9t .node rect,#mermaid-diagram-r2m9t .node circle,#mermaid-diagram-r2m9t .node ellipse,#mermaid-diagram-r2m9t .node polygon,#mermaid-diagram-r2m9t .node path{fill:#eee;stroke:#999;stroke-width:1px;}#mermaid-diagram-r2m9t .rough-node .label text,#mermaid-diagram-r2m9t .node .label text{text-anchor:middle;}#mermaid-diagram-r2m9t .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#mermaid-diagram-r2m9t .node .label{text-align:center;}#mermaid-diagram-r2m9t .node.clickable{cursor:pointer;}#mermaid-diagram-r2m9t .arrowheadPath{fill:#333333;}#mermaid-diagram-r2m9t .edgePath .path{stroke:#666;stroke-width:2.0px;}#mermaid-diagram-r2m9t .flowchart-link{stroke:#666;fill:none;}#mermaid-diagram-r2m9t .edgeLabel{background-color:white;text-align:center;}#mermaid-diagram-r2m9t .edgeLabel p{background-color:white;}#mermaid-diagram-r2m9t .edgeLabel rect{opacity:0.5;background-color:white;fill:white;}#mermaid-diagram-r2m9t .labelBkg{background-color:rgba(255, 255, 255, 0.5);}#mermaid-diagram-r2m9t .cluster rect{fill:hsl(0, 0%, 98.9215686275%);stroke:#707070;stroke-width:1px;}#mermaid-diagram-r2m9t .cluster text{fill:#333;}#mermaid-diagram-r2m9t .cluster span{color:#333;}#mermaid-diagram-r2m9t div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:var(--font-geist-sans);font-size:12px;background:hsl(-160, 0%, 93.3333333333%);border:1px solid #707070;border-radius:2px;pointer-events:none;z-index:100;}#mermaid-diagram-r2m9t .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#000000;}#mermaid-diagram-r2m9t .flowchart-link{stroke:hsl(var(--gray-400));stroke-width:1px;}#mermaid-diagram-r2m9t .marker,#mermaid-diagram-r2m9t marker,#mermaid-diagram-r2m9t marker *{fill:hsl(var(--gray-400))!important;stroke:hsl(var(--gray-400))!important;}#mermaid-diagram-r2m9t .label,#mermaid-diagram-r2m9t text,#mermaid-diagram-r2m9t text>tspan{fill:hsl(var(--black))!important;color:hsl(var(--black))!important;}#mermaid-diagram-r2m9t .background,#mermaid-diagram-r2m9t rect.relationshipLabelBox{fill:hsl(var(--white))!important;}#mermaid-diagram-r2m9t .entityBox,#mermaid-diagram-r2m9t .attributeBoxEven{fill:hsl(var(--gray-150))!important;}#mermaid-diagram-r2m9t .attributeBoxOdd{fill:hsl(var(--white))!important;}#mermaid-diagram-r2m9t .label-container,#mermaid-diagram-r2m9t rect.actor{fill:hsl(var(--white))!important;stroke:hsl(var(--gray-400))!important;}#mermaid-diagram-r2m9t line{stroke:hsl(var(--gray-400))!important;}#mermaid-diagram-r2m9t :root{--mermaid-font-family:var(--font-geist-sans);}HTTPSJWTClient Web/MobileAPI GatewayService d&#39;AuthentificationService UtilisateursService CoursService MessagerieService NotesService AbsencesService Emploi du tempsService RessourcesService AnalytiqueService NotificationsService IABase de données UtilisateursBase de données CoursBase de données MessagerieBase de données NotesBase de données AbsencesBase de données RessourcesBase de données AnalytiqueCache RedisFile d&#39;attenteStockage ObjetsMoteur de Recherche
+flowchart TD
+    Client["Client Web/Mobile"]
+    HTTPS["HTTPS"]
+    JWT["JWT"]
+    Gateway["API Gateway"]
+    Auth["Service d'Authentification"]
+    Users["Service Utilisateurs"]
+    Courses["Service Cours"]
+    Messaging["Service Messagerie"]
+    Grades["Service Notes"]
+    Attendance["Service Absences"]
+    Schedule["Service Emploi du temps"]
+    Resources["Service Ressources"]
+    Analytics["Service Analytique"]
+    Notifications["Service Notifications"]
+    AI["Service IA"]
+    DBUsers["Base de données Utilisateurs"]
+    DBCourses["Base de données Cours"]
+    DBMessaging["Base de données Messagerie"]
+    DBGrades["Base de données Notes"]
+    DBAttendance["Base de données Absences"]
+    DBResources["Base de données Ressources"]
+    DBAnalytics["Base de données Analytique"]
+    Cache["Cache Redis"]
+    Queue["File d'attente"]
+    Storage["Stockage Objets"]
+    Search["Moteur de Recherche"]
+
+    Client --> HTTPS
+    HTTPS --> Gateway
+    Gateway --> JWT
+    JWT --> Auth
+
+    Gateway --> Users
+    Gateway --> Courses
+    Gateway --> Messaging
+    Gateway --> Grades
+    Gateway --> Attendance
+    Gateway --> Schedule
+    Gateway --> Resources
+    Gateway --> Analytics
+    Gateway --> Notifications
+    Gateway --> AI
+
+    Users --> DBUsers
+    Courses --> DBCourses
+    Messaging --> DBMessaging
+    Grades --> DBGrades
+    Attendance --> DBAttendance
+    Resources --> DBResources
+    Analytics --> DBAnalytics
+
+    Users --> Cache
+    Courses --> Cache
+    Messaging --> Cache
+    Schedule --> Cache
+
+    Notifications --> Queue
+    AI --> Queue
+
+    Resources --> Storage
+    Courses --> Storage
+
+    Users --> Search
+    Courses --> Search
+    Resources --> Search
 ```
 
 ### Services Backend
 
 1. **API Gateway**
 
-1. Point d'entrée unique pour toutes les requêtes
-2. Gestion des routes et redirection vers les microservices
-3. Rate limiting et throttling
-4. Logging des requêtes
-
+    1. Point d'entrée unique pour toutes les requêtes
+    2. Gestion des routes et redirection vers les microservices
+    3. Rate limiting et throttling
+    4. Logging des requêtes
 
 2. **Service d'Authentification**
 
-1. Gestion des identités et des sessions
-2. Authentification multi-facteurs
-3. Intégration OAuth pour connexion via Google, Microsoft
-4. Gestion des JWT (JSON Web Tokens)
-
+    1. Gestion des identités et des sessions
+    2. Authentification multi-facteurs
+    3. Intégration OAuth pour connexion via Google, Microsoft
+    4. Gestion des JWT (JSON Web Tokens)
 
 3. **Service Utilisateurs**
 
-1. Gestion des profils (élèves, enseignants, parents, administrateurs)
-2. Gestion des établissements et des classes
-3. Permissions et rôles
-
+    1. Gestion des profils (élèves, enseignants, parents, administrateurs)
+    2. Gestion des établissements et des classes
+    3. Permissions et rôles
 
 4. **Service Cours**
 
-1. Gestion du contenu pédagogique
-2. Organisation des modules et leçons
-3. Suivi de progression
-
+    1. Gestion du contenu pédagogique
+    2. Organisation des modules et leçons
+    3. Suivi de progression
 
 5. **Service Messagerie**
 
-1. Communication entre utilisateurs
-2. Gestion des conversations et groupes
-3. Notifications en temps réel
-
+    1. Communication entre utilisateurs
+    2. Gestion des conversations et groupes
+    3. Notifications en temps réel
 
 6. **Service Notes**
 
-1. Enregistrement et calcul des notes
-2. Bulletins et relevés
-3. Statistiques et moyennes
-
+    1. Enregistrement et calcul des notes
+    2. Bulletins et relevés
+    3. Statistiques et moyennes
 
 7. **Service Absences**
 
-1. Suivi des présences et absences
-2. Justificatifs et validation
-3. Alertes automatiques
-
+    1. Suivi des présences et absences
+    2. Justificatifs et validation
+    3. Alertes automatiques
 
 8. **Service Emploi du temps**
 
-1. Planification des cours
-2. Gestion des salles et ressources
-3. Événements et calendrier
-
+    1. Planification des cours
+    2. Gestion des salles et ressources
+    3. Événements et calendrier
 
 9. **Service Ressources**
 
-1. Gestion des documents pédagogiques
-2. Bibliothèque de médias
-3. Partage de ressources
-
+    1. Gestion des documents pédagogiques
+    2. Bibliothèque de médias
+    3. Partage de ressources
 
 10. **Service Analytique**
 
-1. Suivi des performances
-2. Tableaux de bord personnalisés
-3. Prédictions et recommandations
-
+    1. Suivi des performances
+    2. Tableaux de bord personnalisés
+    3. Prédictions et recommandations
 
 11. **Service Notifications**
 
-1. Alertes par email/SMS
-2. Notifications push
-3. Rappels et événements
-
+    1. Alertes par email/SMS
+    2. Notifications push
+    3. Rappels et événements
 
 12. **Service IA**
 
-1. Assistant pédagogique
-2. Recommandations personnalisées
-3. Analyse prédictive des performances
+    1. Assistant pédagogique
+    2. Recommandations personnalisées
+    3. Analyse prédictive des performances
 
 ## Infrastructure Cloud
 
 ```mermaid
-Infrastructure Cloud EduConnect.download-icon {
-            cursor: pointer;
-            transform-origin: center;
-        }
-        .download-icon .arrow-part {
-            transition: transform 0.35s cubic-bezier(0.35, 0.2, 0.14, 0.95);
-             transform-origin: center;
-        }
-        button:has(.download-icon):hover .download-icon .arrow-part, button:has(.download-icon):focus-visible .download-icon .arrow-part {
-          transform: translateY(-1.5px);
-        }
-        #mermaid-diagram-r2mg0{font-family:var(--font-geist-sans);font-size:12px;fill:#000000;}#mermaid-diagram-r2mg0 .error-icon{fill:#552222;}#mermaid-diagram-r2mg0 .error-text{fill:#552222;stroke:#552222;}#mermaid-diagram-r2mg0 .edge-thickness-normal{stroke-width:1px;}#mermaid-diagram-r2mg0 .edge-thickness-thick{stroke-width:3.5px;}#mermaid-diagram-r2mg0 .edge-pattern-solid{stroke-dasharray:0;}#mermaid-diagram-r2mg0 .edge-thickness-invisible{stroke-width:0;fill:none;}#mermaid-diagram-r2mg0 .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-diagram-r2mg0 .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-diagram-r2mg0 .marker{fill:#666;stroke:#666;}#mermaid-diagram-r2mg0 .marker.cross{stroke:#666;}#mermaid-diagram-r2mg0 svg{font-family:var(--font-geist-sans);font-size:12px;}#mermaid-diagram-r2mg0 p{margin:0;}#mermaid-diagram-r2mg0 .label{font-family:var(--font-geist-sans);color:#000000;}#mermaid-diagram-r2mg0 .cluster-label text{fill:#333;}#mermaid-diagram-r2mg0 .cluster-label span{color:#333;}#mermaid-diagram-r2mg0 .cluster-label span p{background-color:transparent;}#mermaid-diagram-r2mg0 .label text,#mermaid-diagram-r2mg0 span{fill:#000000;color:#000000;}#mermaid-diagram-r2mg0 .node rect,#mermaid-diagram-r2mg0 .node circle,#mermaid-diagram-r2mg0 .node ellipse,#mermaid-diagram-r2mg0 .node polygon,#mermaid-diagram-r2mg0 .node path{fill:#eee;stroke:#999;stroke-width:1px;}#mermaid-diagram-r2mg0 .rough-node .label text,#mermaid-diagram-r2mg0 .node .label text{text-anchor:middle;}#mermaid-diagram-r2mg0 .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#mermaid-diagram-r2mg0 .node .label{text-align:center;}#mermaid-diagram-r2mg0 .node.clickable{cursor:pointer;}#mermaid-diagram-r2mg0 .arrowheadPath{fill:#333333;}#mermaid-diagram-r2mg0 .edgePath .path{stroke:#666;stroke-width:2.0px;}#mermaid-diagram-r2mg0 .flowchart-link{stroke:#666;fill:none;}#mermaid-diagram-r2mg0 .edgeLabel{background-color:white;text-align:center;}#mermaid-diagram-r2mg0 .edgeLabel p{background-color:white;}#mermaid-diagram-r2mg0 .edgeLabel rect{opacity:0.5;background-color:white;fill:white;}#mermaid-diagram-r2mg0 .labelBkg{background-color:rgba(255, 255, 255, 0.5);}#mermaid-diagram-r2mg0 .cluster rect{fill:hsl(0, 0%, 98.9215686275%);stroke:#707070;stroke-width:1px;}#mermaid-diagram-r2mg0 .cluster text{fill:#333;}#mermaid-diagram-r2mg0 .cluster span{color:#333;}#mermaid-diagram-r2mg0 div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:var(--font-geist-sans);font-size:12px;background:hsl(-160, 0%, 93.3333333333%);border:1px solid #707070;border-radius:2px;pointer-events:none;z-index:100;}#mermaid-diagram-r2mg0 .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#000000;}#mermaid-diagram-r2mg0 .flowchart-link{stroke:hsl(var(--gray-400));stroke-width:1px;}#mermaid-diagram-r2mg0 .marker,#mermaid-diagram-r2mg0 marker,#mermaid-diagram-r2mg0 marker *{fill:hsl(var(--gray-400))!important;stroke:hsl(var(--gray-400))!important;}#mermaid-diagram-r2mg0 .label,#mermaid-diagram-r2mg0 text,#mermaid-diagram-r2mg0 text>tspan{fill:hsl(var(--black))!important;color:hsl(var(--black))!important;}#mermaid-diagram-r2mg0 .background,#mermaid-diagram-r2mg0 rect.relationshipLabelBox{fill:hsl(var(--white))!important;}#mermaid-diagram-r2mg0 .entityBox,#mermaid-diagram-r2mg0 .attributeBoxEven{fill:hsl(var(--gray-150))!important;}#mermaid-diagram-r2mg0 .attributeBoxOdd{fill:hsl(var(--white))!important;}#mermaid-diagram-r2mg0 .label-container,#mermaid-diagram-r2mg0 rect.actor{fill:hsl(var(--white))!important;stroke:hsl(var(--gray-400))!important;}#mermaid-diagram-r2mg0 line{stroke:hsl(var(--gray-400))!important;}#mermaid-diagram-r2mg0 :root{--mermaid-font-family:var(--font-geist-sans);}InternetCDNLoad BalancerWeb Application FirewallFrontend Next.jsCluster APIAPI Instance 1API Instance 2API Instance 3Cluster ServicesService Instance 1Service Instance 2Service Instance 3Cluster Base de donnéesDB PrimaireDB Réplica 1DB Réplica 2Cluster CacheCache Instance 1Cache Instance 2Stockage ObjetsMonitoring &amp; AlertingCentralisation LogsCI/CD Pipeline
+flowchart TD
+    Internet["Internet"]
+    CDN["CDN"]
+    LoadBalancer["Load Balancer"]
+    WAF["Web Application Firewall"]
+    Frontend["Frontend Next.js"]
+
+    ClusterAPI["Cluster API"]
+    API1["API Instance 1"]
+    API2["API Instance 2"]
+    API3["API Instance 3"]
+
+    ClusterServices["Cluster Services"]
+    Service1["Service Instance 1"]
+    Service2["Service Instance 2"]
+    Service3["Service Instance 3"]
+
+    ClusterDB["Cluster Base de données"]
+    DBPrimary["DB Primaire"]
+    DBReplica1["DB Réplica 1"]
+    DBReplica2["DB Réplica 2"]
+
+    ClusterCache["Cluster Cache"]
+    Cache1["Cache Instance 1"]
+    Cache2["Cache Instance 2"]
+
+    Storage["Stockage Objets"]
+    Monitoring["Monitoring & Alerting"]
+    Logs["Centralisation Logs"]
+    CICD["CI/CD Pipeline"]
+
+    Internet --> CDN
+    CDN --> LoadBalancer
+    LoadBalancer --> WAF
+    WAF --> Frontend
+    WAF --> ClusterAPI
+
+    ClusterAPI --> API1
+    ClusterAPI --> API2
+    ClusterAPI --> API3
+
+    API1 --> ClusterServices
+    API2 --> ClusterServices
+    API3 --> ClusterServices
+
+    ClusterServices --> Service1
+    ClusterServices --> Service2
+    ClusterServices --> Service3
+
+    Service1 --> ClusterDB
+    Service2 --> ClusterDB
+    Service3 --> ClusterDB
+
+    ClusterDB --> DBPrimary
+    ClusterDB --> DBReplica1
+    ClusterDB --> DBReplica2
+
+    Service1 --> ClusterCache
+    Service2 --> ClusterCache
+    Service3 --> ClusterCache
+
+    ClusterCache --> Cache1
+    ClusterCache --> Cache2
+
+    Service1 --> Storage
+    Service2 --> Storage
+    Service3 --> Storage
+
+    ClusterAPI --> Monitoring
+    ClusterServices --> Monitoring
+    ClusterDB --> Monitoring
+    ClusterCache --> Monitoring
+
+    ClusterAPI --> Logs
+    ClusterServices --> Logs
+    ClusterDB --> Logs
+    ClusterCache --> Logs
+
+    CICD --> Frontend
+    CICD --> ClusterAPI
+    CICD --> ClusterServices
 ```
 
 ### Composants d'Infrastructure
 
 1. **CDN (Content Delivery Network)**
 
-1. Distribution globale des assets statiques
-2. Mise en cache des contenus fréquemment accédés
-3. Réduction de la latence pour les utilisateurs
-
+    1. Distribution globale des assets statiques
+    2. Mise en cache des contenus fréquemment accédés
+    3. Réduction de la latence pour les utilisateurs
 
 2. **WAF (Web Application Firewall)**
 
-1. Protection contre les attaques web (XSS, CSRF, injection SQL)
-2. Filtrage du trafic malveillant
-3. Conformité aux normes de sécurité
-
+    1. Protection contre les attaques web (XSS, CSRF, injection SQL)
+    2. Filtrage du trafic malveillant
+    3. Conformité aux normes de sécurité
 
 3. **Load Balancer**
 
-1. Répartition du trafic entre les instances
-2. Haute disponibilité et failover
-3. Health checks des services
-
+    1. Répartition du trafic entre les instances
+    2. Haute disponibilité et failover
+    3. Health checks des services
 
 4. **Clusters Kubernetes**
 
-1. Orchestration des conteneurs
-2. Auto-scaling basé sur la charge
-3. Déploiements sans interruption de service
-
+    1. Orchestration des conteneurs
+    2. Auto-scaling basé sur la charge
+    3. Déploiements sans interruption de service
 
 5. **Base de données**
 
-1. Architecture primaire-réplica pour haute disponibilité
-2. Sharding pour la scalabilité horizontale
-3. Sauvegardes automatisées et point-in-time recovery
-
+    1. Architecture primaire-réplica pour haute disponibilité
+    2. Sharding pour la scalabilité horizontale
+    3. Sauvegardes automatisées et point-in-time recovery
 
 6. **Cache Redis**
 
-1. Mise en cache des données fréquemment accédées
-2. Sessions utilisateurs
-3. Réduction de la charge sur les bases de données
-
+    1. Mise en cache des données fréquemment accédées
+    2. Sessions utilisateurs
+    3. Réduction de la charge sur les bases de données
 
 7. **Stockage Objets**
 
-1. Stockage des fichiers et médias
-2. Versioning et contrôle d'accès
-3. Réplication multi-régions
-
+    1. Stockage des fichiers et médias
+    2. Versioning et contrôle d'accès
+    3. Réplication multi-régions
 
 8. **Monitoring & Alerting**
 
-1. Surveillance en temps réel des performances
-2. Alertes automatiques en cas d'anomalies
-3. Tableaux de bord opérationnels
-
+    1. Surveillance en temps réel des performances
+    2. Alertes automatiques en cas d'anomalies
+    3. Tableaux de bord opérationnels
 
 9. **Centralisation des Logs**
 
-1. Agrégation de tous les logs applicatifs
-2. Analyse et recherche
-3. Conservation à long terme pour audit
-
+    1. Agrégation de tous les logs applicatifs
+    2. Analyse et recherche
+    3. Conservation à long terme pour audit
 
 10. **CI/CD Pipeline**
 
-1. Intégration et déploiement continus
-2. Tests automatisés
-3. Rollbacks automatiques en cas d'échec
+    1. Intégration et déploiement continus
+    2. Tests automatisés
+    3. Rollbacks automatiques en cas d'échec
 
 ## Architecture de Données
 
 ```mermaid
-Architecture de Données EduConnect.download-icon {
-            cursor: pointer;
-            transform-origin: center;
-        }
-        .download-icon .arrow-part {
-            transition: transform 0.35s cubic-bezier(0.35, 0.2, 0.14, 0.95);
-             transform-origin: center;
-        }
-        button:has(.download-icon):hover .download-icon .arrow-part, button:has(.download-icon):focus-visible .download-icon .arrow-part {
-          transform: translateY(-1.5px);
-        }
-        #mermaid-diagram-r2mkv{font-family:var(--font-geist-sans);font-size:12px;fill:#000000;}#mermaid-diagram-r2mkv .error-icon{fill:#552222;}#mermaid-diagram-r2mkv .error-text{fill:#552222;stroke:#552222;}#mermaid-diagram-r2mkv .edge-thickness-normal{stroke-width:1px;}#mermaid-diagram-r2mkv .edge-thickness-thick{stroke-width:3.5px;}#mermaid-diagram-r2mkv .edge-pattern-solid{stroke-dasharray:0;}#mermaid-diagram-r2mkv .edge-thickness-invisible{stroke-width:0;fill:none;}#mermaid-diagram-r2mkv .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-diagram-r2mkv .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-diagram-r2mkv .marker{fill:#666;stroke:#666;}#mermaid-diagram-r2mkv .marker.cross{stroke:#666;}#mermaid-diagram-r2mkv svg{font-family:var(--font-geist-sans);font-size:12px;}#mermaid-diagram-r2mkv p{margin:0;}#mermaid-diagram-r2mkv .label{font-family:var(--font-geist-sans);color:#000000;}#mermaid-diagram-r2mkv .cluster-label text{fill:#333;}#mermaid-diagram-r2mkv .cluster-label span{color:#333;}#mermaid-diagram-r2mkv .cluster-label span p{background-color:transparent;}#mermaid-diagram-r2mkv .label text,#mermaid-diagram-r2mkv span{fill:#000000;color:#000000;}#mermaid-diagram-r2mkv .node rect,#mermaid-diagram-r2mkv .node circle,#mermaid-diagram-r2mkv .node ellipse,#mermaid-diagram-r2mkv .node polygon,#mermaid-diagram-r2mkv .node path{fill:#eee;stroke:#999;stroke-width:1px;}#mermaid-diagram-r2mkv .rough-node .label text,#mermaid-diagram-r2mkv .node .label text{text-anchor:middle;}#mermaid-diagram-r2mkv .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#mermaid-diagram-r2mkv .node .label{text-align:center;}#mermaid-diagram-r2mkv .node.clickable{cursor:pointer;}#mermaid-diagram-r2mkv .arrowheadPath{fill:#333333;}#mermaid-diagram-r2mkv .edgePath .path{stroke:#666;stroke-width:2.0px;}#mermaid-diagram-r2mkv .flowchart-link{stroke:#666;fill:none;}#mermaid-diagram-r2mkv .edgeLabel{background-color:white;text-align:center;}#mermaid-diagram-r2mkv .edgeLabel p{background-color:white;}#mermaid-diagram-r2mkv .edgeLabel rect{opacity:0.5;background-color:white;fill:white;}#mermaid-diagram-r2mkv .labelBkg{background-color:rgba(255, 255, 255, 0.5);}#mermaid-diagram-r2mkv .cluster rect{fill:hsl(0, 0%, 98.9215686275%);stroke:#707070;stroke-width:1px;}#mermaid-diagram-r2mkv .cluster text{fill:#333;}#mermaid-diagram-r2mkv .cluster span{color:#333;}#mermaid-diagram-r2mkv div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:var(--font-geist-sans);font-size:12px;background:hsl(-160, 0%, 93.3333333333%);border:1px solid #707070;border-radius:2px;pointer-events:none;z-index:100;}#mermaid-diagram-r2mkv .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#000000;}#mermaid-diagram-r2mkv .flowchart-link{stroke:hsl(var(--gray-400));stroke-width:1px;}#mermaid-diagram-r2mkv .marker,#mermaid-diagram-r2mkv marker,#mermaid-diagram-r2mkv marker *{fill:hsl(var(--gray-400))!important;stroke:hsl(var(--gray-400))!important;}#mermaid-diagram-r2mkv .label,#mermaid-diagram-r2mkv text,#mermaid-diagram-r2mkv text>tspan{fill:hsl(var(--black))!important;color:hsl(var(--black))!important;}#mermaid-diagram-r2mkv .background,#mermaid-diagram-r2mkv rect.relationshipLabelBox{fill:hsl(var(--white))!important;}#mermaid-diagram-r2mkv .entityBox,#mermaid-diagram-r2mkv .attributeBoxEven{fill:hsl(var(--gray-150))!important;}#mermaid-diagram-r2mkv .attributeBoxOdd{fill:hsl(var(--white))!important;}#mermaid-diagram-r2mkv .label-container,#mermaid-diagram-r2mkv rect.actor{fill:hsl(var(--white))!important;stroke:hsl(var(--gray-400))!important;}#mermaid-diagram-r2mkv line{stroke:hsl(var(--gray-400))!important;}#mermaid-diagram-r2mkv :root{--mermaid-font-family:var(--font-geist-sans);}Base de données analytiquePerformancesUtilisationTendancesPrédictionsBase de données principaleUtilisateursÉtablissementsClassesCoursLeçonsDevoirsNotesPrésencesMessagesRessourcesEmploi du tempsBase de données principaleBase de données analytiqueBase de données d&#39;archivageProcessus ETL
+flowchart TD
+    DBAnalytique["Base de données analytique"]
+    Performances["Performances"]
+    Utilisation["Utilisation"]
+    Tendances["Tendances"]
+    Predictions["Prédictions"]
+
+    DBPrincipale["Base de données principale"]
+    Users["Utilisateurs"]
+    Etablissements["Établissements"]
+    Classes["Classes"]
+    Cours["Cours"]
+    Lecons["Leçons"]
+    Devoirs["Devoirs"]
+    Notes["Notes"]
+    Presences["Présences"]
+    Messages["Messages"]
+    Ressources["Ressources"]
+    EmploiTemps["Emploi du temps"]
+
+    DBArchivage["Base de données d'archivage"]
+    ETL["Processus ETL"]
+
+    DBPrincipale --> ETL
+    ETL --> DBAnalytique
+    ETL --> DBArchivage
+
+    DBAnalytique --> Performances
+    DBAnalytique --> Utilisation
+    DBAnalytique --> Tendances
+    DBAnalytique --> Predictions
+
+    DBPrincipale --> Users
+    DBPrincipale --> Etablissements
+    DBPrincipale --> Classes
+    DBPrincipale --> Cours
+    DBPrincipale --> Lecons
+    DBPrincipale --> Devoirs
+    DBPrincipale --> Notes
+    DBPrincipale --> Presences
+    DBPrincipale --> Messages
+    DBPrincipale --> Ressources
+    DBPrincipale --> EmploiTemps
 ```
 
 ## Sécurité et Conformité
 
 ```mermaid
-Sécurité EduConnect.download-icon {
-            cursor: pointer;
-            transform-origin: center;
-        }
-        .download-icon .arrow-part {
-            transition: transform 0.35s cubic-bezier(0.35, 0.2, 0.14, 0.95);
-             transform-origin: center;
-        }
-        button:has(.download-icon):hover .download-icon .arrow-part, button:has(.download-icon):focus-visible .download-icon .arrow-part {
-          transform: translateY(-1.5px);
-        }
-        #mermaid-diagram-r2ml4{font-family:var(--font-geist-sans);font-size:12px;fill:#000000;}#mermaid-diagram-r2ml4 .error-icon{fill:#552222;}#mermaid-diagram-r2ml4 .error-text{fill:#552222;stroke:#552222;}#mermaid-diagram-r2ml4 .edge-thickness-normal{stroke-width:1px;}#mermaid-diagram-r2ml4 .edge-thickness-thick{stroke-width:3.5px;}#mermaid-diagram-r2ml4 .edge-pattern-solid{stroke-dasharray:0;}#mermaid-diagram-r2ml4 .edge-thickness-invisible{stroke-width:0;fill:none;}#mermaid-diagram-r2ml4 .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-diagram-r2ml4 .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-diagram-r2ml4 .marker{fill:#666;stroke:#666;}#mermaid-diagram-r2ml4 .marker.cross{stroke:#666;}#mermaid-diagram-r2ml4 svg{font-family:var(--font-geist-sans);font-size:12px;}#mermaid-diagram-r2ml4 p{margin:0;}#mermaid-diagram-r2ml4 .label{font-family:var(--font-geist-sans);color:#000000;}#mermaid-diagram-r2ml4 .cluster-label text{fill:#333;}#mermaid-diagram-r2ml4 .cluster-label span{color:#333;}#mermaid-diagram-r2ml4 .cluster-label span p{background-color:transparent;}#mermaid-diagram-r2ml4 .label text,#mermaid-diagram-r2ml4 span{fill:#000000;color:#000000;}#mermaid-diagram-r2ml4 .node rect,#mermaid-diagram-r2ml4 .node circle,#mermaid-diagram-r2ml4 .node ellipse,#mermaid-diagram-r2ml4 .node polygon,#mermaid-diagram-r2ml4 .node path{fill:#eee;stroke:#999;stroke-width:1px;}#mermaid-diagram-r2ml4 .rough-node .label text,#mermaid-diagram-r2ml4 .node .label text{text-anchor:middle;}#mermaid-diagram-r2ml4 .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#mermaid-diagram-r2ml4 .node .label{text-align:center;}#mermaid-diagram-r2ml4 .node.clickable{cursor:pointer;}#mermaid-diagram-r2ml4 .arrowheadPath{fill:#333333;}#mermaid-diagram-r2ml4 .edgePath .path{stroke:#666;stroke-width:2.0px;}#mermaid-diagram-r2ml4 .flowchart-link{stroke:#666;fill:none;}#mermaid-diagram-r2ml4 .edgeLabel{background-color:white;text-align:center;}#mermaid-diagram-r2ml4 .edgeLabel p{background-color:white;}#mermaid-diagram-r2ml4 .edgeLabel rect{opacity:0.5;background-color:white;fill:white;}#mermaid-diagram-r2ml4 .labelBkg{background-color:rgba(255, 255, 255, 0.5);}#mermaid-diagram-r2ml4 .cluster rect{fill:hsl(0, 0%, 98.9215686275%);stroke:#707070;stroke-width:1px;}#mermaid-diagram-r2ml4 .cluster text{fill:#333;}#mermaid-diagram-r2ml4 .cluster span{color:#333;}#mermaid-diagram-r2ml4 div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:var(--font-geist-sans);font-size:12px;background:hsl(-160, 0%, 93.3333333333%);border:1px solid #707070;border-radius:2px;pointer-events:none;z-index:100;}#mermaid-diagram-r2ml4 .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#000000;}#mermaid-diagram-r2ml4 .flowchart-link{stroke:hsl(var(--gray-400));stroke-width:1px;}#mermaid-diagram-r2ml4 .marker,#mermaid-diagram-r2ml4 marker,#mermaid-diagram-r2ml4 marker *{fill:hsl(var(--gray-400))!important;stroke:hsl(var(--gray-400))!important;}#mermaid-diagram-r2ml4 .label,#mermaid-diagram-r2ml4 text,#mermaid-diagram-r2ml4 text>tspan{fill:hsl(var(--black))!important;color:hsl(var(--black))!important;}#mermaid-diagram-r2ml4 .background,#mermaid-diagram-r2ml4 rect.relationshipLabelBox{fill:hsl(var(--white))!important;}#mermaid-diagram-r2ml4 .entityBox,#mermaid-diagram-r2ml4 .attributeBoxEven{fill:hsl(var(--gray-150))!important;}#mermaid-diagram-r2ml4 .attributeBoxOdd{fill:hsl(var(--white))!important;}#mermaid-diagram-r2ml4 .label-container,#mermaid-diagram-r2ml4 rect.actor{fill:hsl(var(--white))!important;stroke:hsl(var(--gray-400))!important;}#mermaid-diagram-r2ml4 line{stroke:hsl(var(--gray-400))!important;}#mermaid-diagram-r2ml4 :root{--mermaid-font-family:var(--font-geist-sans);}AuthentificationContrôle d&#39;accèsChiffrementAudit &amp; LogsConformitéMulti-facteurSingle Sign-OnTokens JWTRBACPolitiques d&#39;accèsFiltrage IPDonnées au reposDonnées en transitChiffrement E2EActivité utilisateurActions administrativesÉvénements systèmeRGPDProtection des mineursRéglementations locales
+flowchart TD
+    Securite["Sécurité"]
+
+    Authentification["Authentification"]
+    MultiFacteur["Multi-facteur"]
+    SSO["Single Sign-On"]
+    JWT["Tokens JWT"]
+
+    Acces["Contrôle d'accès"]
+    RBAC["RBAC"]
+    Politiques["Politiques d'accès"]
+    FiltrageIP["Filtrage IP"]
+
+    Chiffrement["Chiffrement"]
+    DonneesRepos["Données au repos"]
+    DonneesTransit["Données en transit"]
+    E2E["Chiffrement E2E"]
+
+    Audit["Audit & Logs"]
+    ActiviteUtilisateur["Activité utilisateur"]
+    ActionsAdmin["Actions administratives"]
+    EventsSystem["Événements système"]
+
+    Conformite["Conformité"]
+    RGPD["RGPD"]
+    Mineurs["Protection des mineurs"]
+    RegulationsLocales["Réglementations locales"]
+
+    Securite --> Authentification
+    Securite --> Acces
+    Securite --> Chiffrement
+    Securite --> Audit
+    Securite --> Conformite
+
+    Authentification --> MultiFacteur
+    Authentification --> SSO
+    Authentification --> JWT
+
+    Acces --> RBAC
+    Acces --> Politiques
+    Acces --> FiltrageIP
+
+    Chiffrement --> DonneesRepos
+    Chiffrement --> DonneesTransit
+    Chiffrement --> E2E
+
+    Audit --> ActiviteUtilisateur
+    Audit --> ActionsAdmin
+    Audit --> EventsSystem
+
+    Conformite --> RGPD
+    Conformite --> Mineurs
+    Conformite --> RegulationsLocales
 ```
 
 ## Intégrations Tierces
 
 ```mermaid
-Intégrations EduConnect.download-icon {
-            cursor: pointer;
-            transform-origin: center;
-        }
-        .download-icon .arrow-part {
-            transition: transform 0.35s cubic-bezier(0.35, 0.2, 0.14, 0.95);
-             transform-origin: center;
-        }
-        button:has(.download-icon):hover .download-icon .arrow-part, button:has(.download-icon):focus-visible .download-icon .arrow-part {
-          transform: translateY(-1.5px);
-        }
-        #mermaid-diagram-r2ml9{font-family:var(--font-geist-sans);font-size:12px;fill:#000000;}#mermaid-diagram-r2ml9 .error-icon{fill:#552222;}#mermaid-diagram-r2ml9 .error-text{fill:#552222;stroke:#552222;}#mermaid-diagram-r2ml9 .edge-thickness-normal{stroke-width:1px;}#mermaid-diagram-r2ml9 .edge-thickness-thick{stroke-width:3.5px;}#mermaid-diagram-r2ml9 .edge-pattern-solid{stroke-dasharray:0;}#mermaid-diagram-r2ml9 .edge-thickness-invisible{stroke-width:0;fill:none;}#mermaid-diagram-r2ml9 .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-diagram-r2ml9 .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-diagram-r2ml9 .marker{fill:#666;stroke:#666;}#mermaid-diagram-r2ml9 .marker.cross{stroke:#666;}#mermaid-diagram-r2ml9 svg{font-family:var(--font-geist-sans);font-size:12px;}#mermaid-diagram-r2ml9 p{margin:0;}#mermaid-diagram-r2ml9 .label{font-family:var(--font-geist-sans);color:#000000;}#mermaid-diagram-r2ml9 .cluster-label text{fill:#333;}#mermaid-diagram-r2ml9 .cluster-label span{color:#333;}#mermaid-diagram-r2ml9 .cluster-label span p{background-color:transparent;}#mermaid-diagram-r2ml9 .label text,#mermaid-diagram-r2ml9 span{fill:#000000;color:#000000;}#mermaid-diagram-r2ml9 .node rect,#mermaid-diagram-r2ml9 .node circle,#mermaid-diagram-r2ml9 .node ellipse,#mermaid-diagram-r2ml9 .node polygon,#mermaid-diagram-r2ml9 .node path{fill:#eee;stroke:#999;stroke-width:1px;}#mermaid-diagram-r2ml9 .rough-node .label text,#mermaid-diagram-r2ml9 .node .label text{text-anchor:middle;}#mermaid-diagram-r2ml9 .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#mermaid-diagram-r2ml9 .node .label{text-align:center;}#mermaid-diagram-r2ml9 .node.clickable{cursor:pointer;}#mermaid-diagram-r2ml9 .arrowheadPath{fill:#333333;}#mermaid-diagram-r2ml9 .edgePath .path{stroke:#666;stroke-width:2.0px;}#mermaid-diagram-r2ml9 .flowchart-link{stroke:#666;fill:none;}#mermaid-diagram-r2ml9 .edgeLabel{background-color:white;text-align:center;}#mermaid-diagram-r2ml9 .edgeLabel p{background-color:white;}#mermaid-diagram-r2ml9 .edgeLabel rect{opacity:0.5;background-color:white;fill:white;}#mermaid-diagram-r2ml9 .labelBkg{background-color:rgba(255, 255, 255, 0.5);}#mermaid-diagram-r2ml9 .cluster rect{fill:hsl(0, 0%, 98.9215686275%);stroke:#707070;stroke-width:1px;}#mermaid-diagram-r2ml9 .cluster text{fill:#333;}#mermaid-diagram-r2ml9 .cluster span{color:#333;}#mermaid-diagram-r2ml9 div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:var(--font-geist-sans);font-size:12px;background:hsl(-160, 0%, 93.3333333333%);border:1px solid #707070;border-radius:2px;pointer-events:none;z-index:100;}#mermaid-diagram-r2ml9 .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#000000;}#mermaid-diagram-r2ml9 .flowchart-link{stroke:hsl(var(--gray-400));stroke-width:1px;}#mermaid-diagram-r2ml9 .marker,#mermaid-diagram-r2ml9 marker,#mermaid-diagram-r2ml9 marker *{fill:hsl(var(--gray-400))!important;stroke:hsl(var(--gray-400))!important;}#mermaid-diagram-r2ml9 .label,#mermaid-diagram-r2ml9 text,#mermaid-diagram-r2ml9 text>tspan{fill:hsl(var(--black))!important;color:hsl(var(--black))!important;}#mermaid-diagram-r2ml9 .background,#mermaid-diagram-r2ml9 rect.relationshipLabelBox{fill:hsl(var(--white))!important;}#mermaid-diagram-r2ml9 .entityBox,#mermaid-diagram-r2ml9 .attributeBoxEven{fill:hsl(var(--gray-150))!important;}#mermaid-diagram-r2ml9 .attributeBoxOdd{fill:hsl(var(--white))!important;}#mermaid-diagram-r2ml9 .label-container,#mermaid-diagram-r2ml9 rect.actor{fill:hsl(var(--white))!important;stroke:hsl(var(--gray-400))!important;}#mermaid-diagram-r2ml9 line{stroke:hsl(var(--gray-400))!important;}#mermaid-diagram-r2ml9 :root{--mermaid-font-family:var(--font-geist-sans);}EduConnectFournisseurs d&#39;identitéGoogleMicrosoftApplePasserelles de paiementStripePayPalMobile MoneyCommunicationService d&#39;emailPasserelle SMSNotifications PushContenu éducatifÉditeursRessources libresPlateformes vidéoServices IAOpenAIGoogle AIIA personnalisée
+flowchart TD
+    EduConnect["EduConnect"]
+
+    Identite["Fournisseurs d'identité"]
+    Google["Google"]
+    Microsoft["Microsoft"]
+    Apple["Apple"]
+
+    Paiement["Passerelles de paiement"]
+    Stripe["Stripe"]
+    PayPal["PayPal"]
+    MobileMoney["Mobile Money"]
+
+    Communication["Communication"]
+    Email["Service d'email"]
+    SMS["Passerelle SMS"]
+    Push["Notifications Push"]
+
+    Contenu["Contenu éducatif"]
+    Editeurs["Éditeurs"]
+    Ressources["Ressources libres"]
+    Video["Plateformes vidéo"]
+
+    IA["Services IA"]
+    OpenAI["OpenAI"]
+    GoogleAI["Google AI"]
+    CustomAI["IA personnalisée"]
+
+    EduConnect --> Identite
+    EduConnect --> Paiement
+    EduConnect --> Communication
+    EduConnect --> Contenu
+    EduConnect --> IA
+
+    Identite --> Google
+    Identite --> Microsoft
+    Identite --> Apple
+
+    Paiement --> Stripe
+    Paiement --> PayPal
+    Paiement --> MobileMoney
+
+    Communication --> Email
+    Communication --> SMS
+    Communication --> Push
+
+    Contenu --> Editeurs
+    Contenu --> Ressources
+    Contenu --> Video
+
+    IA --> OpenAI
+    IA --> GoogleAI
+    IA --> CustomAI
 ```
 
 ## Stratégie de Déploiement
 
 ```mermaid
-Déploiement EduConnect.download-icon {
-            cursor: pointer;
-            transform-origin: center;
-        }
-        .download-icon .arrow-part {
-            transition: transform 0.35s cubic-bezier(0.35, 0.2, 0.14, 0.95);
-             transform-origin: center;
-        }
-        button:has(.download-icon):hover .download-icon .arrow-part, button:has(.download-icon):focus-visible .download-icon .arrow-part {
-          transform: translateY(-1.5px);
-        }
-        #mermaid-diagram-r2mle{font-family:var(--font-geist-sans);font-size:12px;fill:#000000;}#mermaid-diagram-r2mle .error-icon{fill:#552222;}#mermaid-diagram-r2mle .error-text{fill:#552222;stroke:#552222;}#mermaid-diagram-r2mle .edge-thickness-normal{stroke-width:1px;}#mermaid-diagram-r2mle .edge-thickness-thick{stroke-width:3.5px;}#mermaid-diagram-r2mle .edge-pattern-solid{stroke-dasharray:0;}#mermaid-diagram-r2mle .edge-thickness-invisible{stroke-width:0;fill:none;}#mermaid-diagram-r2mle .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-diagram-r2mle .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-diagram-r2mle .marker{fill:#666;stroke:#666;}#mermaid-diagram-r2mle .marker.cross{stroke:#666;}#mermaid-diagram-r2mle svg{font-family:var(--font-geist-sans);font-size:12px;}#mermaid-diagram-r2mle p{margin:0;}#mermaid-diagram-r2mle .label{font-family:var(--font-geist-sans);color:#000000;}#mermaid-diagram-r2mle .cluster-label text{fill:#333;}#mermaid-diagram-r2mle .cluster-label span{color:#333;}#mermaid-diagram-r2mle .cluster-label span p{background-color:transparent;}#mermaid-diagram-r2mle .label text,#mermaid-diagram-r2mle span{fill:#000000;color:#000000;}#mermaid-diagram-r2mle .node rect,#mermaid-diagram-r2mle .node circle,#mermaid-diagram-r2mle .node ellipse,#mermaid-diagram-r2mle .node polygon,#mermaid-diagram-r2mle .node path{fill:#eee;stroke:#999;stroke-width:1px;}#mermaid-diagram-r2mle .rough-node .label text,#mermaid-diagram-r2mle .node .label text{text-anchor:middle;}#mermaid-diagram-r2mle .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#mermaid-diagram-r2mle .node .label{text-align:center;}#mermaid-diagram-r2mle .node.clickable{cursor:pointer;}#mermaid-diagram-r2mle .arrowheadPath{fill:#333333;}#mermaid-diagram-r2mle .edgePath .path{stroke:#666;stroke-width:2.0px;}#mermaid-diagram-r2mle .flowchart-link{stroke:#666;fill:none;}#mermaid-diagram-r2mle .edgeLabel{background-color:white;text-align:center;}#mermaid-diagram-r2mle .edgeLabel p{background-color:white;}#mermaid-diagram-r2mle .edgeLabel rect{opacity:0.5;background-color:white;fill:white;}#mermaid-diagram-r2mle .labelBkg{background-color:rgba(255, 255, 255, 0.5);}#mermaid-diagram-r2mle .cluster rect{fill:hsl(0, 0%, 98.9215686275%);stroke:#707070;stroke-width:1px;}#mermaid-diagram-r2mle .cluster text{fill:#333;}#mermaid-diagram-r2mle .cluster span{color:#333;}#mermaid-diagram-r2mle div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:var(--font-geist-sans);font-size:12px;background:hsl(-160, 0%, 93.3333333333%);border:1px solid #707070;border-radius:2px;pointer-events:none;z-index:100;}#mermaid-diagram-r2mle .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#000000;}#mermaid-diagram-r2mle .flowchart-link{stroke:hsl(var(--gray-400));stroke-width:1px;}#mermaid-diagram-r2mle .marker,#mermaid-diagram-r2mle marker,#mermaid-diagram-r2mle marker *{fill:hsl(var(--gray-400))!important;stroke:hsl(var(--gray-400))!important;}#mermaid-diagram-r2mle .label,#mermaid-diagram-r2mle text,#mermaid-diagram-r2mle text>tspan{fill:hsl(var(--black))!important;color:hsl(var(--black))!important;}#mermaid-diagram-r2mle .background,#mermaid-diagram-r2mle rect.relationshipLabelBox{fill:hsl(var(--white))!important;}#mermaid-diagram-r2mle .entityBox,#mermaid-diagram-r2mle .attributeBoxEven{fill:hsl(var(--gray-150))!important;}#mermaid-diagram-r2mle .attributeBoxOdd{fill:hsl(var(--white))!important;}#mermaid-diagram-r2mle .label-container,#mermaid-diagram-r2mle rect.actor{fill:hsl(var(--white))!important;stroke:hsl(var(--gray-400))!important;}#mermaid-diagram-r2mle line{stroke:hsl(var(--gray-400))!important;}#mermaid-diagram-r2mle :root{--mermaid-font-family:var(--font-geist-sans);}Processus CDApprobationDéploiementTests de fuméeRollback automatiqueProcessus CIBuildTests unitairesTests d&#39;intégrationScan de sécuritéQualité du codeEnvironnement DevEnvironnement TestEnvironnement StagingEnvironnement ProductionRepository GitCI PipelineCD Pipeline
+flowchart TD
+    Repository["Repository Git"]
+    CIPipeline["CI Pipeline"]
+    CDPipeline["CD Pipeline"]
+
+    ProcessusCI["Processus CI"]
+    Build["Build"]
+    TestsUnit["Tests unitaires"]
+    TestsIntegration["Tests d'intégration"]
+    Security["Scan de sécurité"]
+    CodeQuality["Qualité du code"]
+
+    ProcessusCD["Processus CD"]
+    Approbation["Approbation"]
+    Deploiement["Déploiement"]
+    TestsFumee["Tests de fumée"]
+    Rollback["Rollback automatique"]
+
+    EnvDev["Environnement Dev"]
+    EnvTest["Environnement Test"]
+    EnvStaging["Environnement Staging"]
+    EnvProd["Environnement Production"]
+
+    Repository --> CIPipeline
+    CIPipeline --> ProcessusCI
+    ProcessusCI --> Build
+    Build --> TestsUnit
+    TestsUnit --> TestsIntegration
+    TestsIntegration --> Security
+    Security --> CodeQuality
+
+    CIPipeline --> CDPipeline
+    CDPipeline --> ProcessusCD
+    ProcessusCD --> Approbation
+    Approbation --> Deploiement
+    Deploiement --> TestsFumee
+    TestsFumee --> Rollback
+
+    CDPipeline --> EnvDev
+    CDPipeline --> EnvTest
+    CDPipeline --> EnvStaging
+    CDPipeline --> EnvProd
 ```
 
 ## Considérations Spécifiques pour l'Afrique
 
 1. **Optimisation pour faible bande passante**
 
-1. Compression des données
-2. Mode hors ligne pour les ressources essentielles
-3. Synchronisation intelligente
-
+    1. Compression des données
+    2. Mode hors ligne pour les ressources essentielles
+    3. Synchronisation intelligente
 
 2. **Support multi-langues**
 
-1. Français, anglais et langues locales
-2. Contenu adapté culturellement
-
+    1. Français, anglais et langues locales
+    2. Contenu adapté culturellement
 
 3. **Paiements locaux**
 
-1. Intégration avec Mobile Money
-2. Options de paiement hors ligne
-3. Facturation adaptée aux établissements
-
+    1. Intégration avec Mobile Money
+    2. Options de paiement hors ligne
+    3. Facturation adaptée aux établissements
 
 4. **Hébergement régional**
 
-1. Datacenters en Afrique quand disponible
-2. Conformité avec les lois locales sur les données
-
+    1. Datacenters en Afrique quand disponible
+    2. Conformité avec les lois locales sur les données
 
 5. **Résilience aux coupures**
 
-1. Gestion des interruptions de connexion
-2. Reprise automatique des opérations
+    1. Gestion des interruptions de connexion
+    2. Reprise automatique des opérations
 
 Cette architecture est conçue pour être évolutive, permettant à EduConnect de commencer avec une infrastructure modeste
 et de se développer en fonction de la croissance des utilisateurs et des besoins. Elle prend également en compte les
 défis spécifiques du marché africain tout en offrant une plateforme robuste et sécurisée.
 
-### Architecture Backend Monolithique Modulaire pour EduConnect
+## Architecture Backend Monolithique Modulaire pour EduConnect
 
 Voici une proposition d'architecture backend monolithique modulaire pour la plateforme EduConnect, adaptée au contexte
 africain.
 
-## Architecture Backend Monolithique Modulaire
+### Architecture Backend Monolithique Modulaire
 
 ```mermaid
-Architecture Backend Monolithique Modulaire.download-icon {
-            cursor: pointer;
-            transform-origin: center;
-        }
-        .download-icon .arrow-part {
-            transition: transform 0.35s cubic-bezier(0.35, 0.2, 0.14, 0.95);
-             transform-origin: center;
-        }
-        button:has(.download-icon):hover .download-icon .arrow-part, button:has(.download-icon):focus-visible .download-icon .arrow-part {
-          transform: translateY(-1.5px);
-        }
-        #mermaid-diagram-r2lrh{font-family:var(--font-geist-sans);font-size:12px;fill:#000000;}#mermaid-diagram-r2lrh .error-icon{fill:#552222;}#mermaid-diagram-r2lrh .error-text{fill:#552222;stroke:#552222;}#mermaid-diagram-r2lrh .edge-thickness-normal{stroke-width:1px;}#mermaid-diagram-r2lrh .edge-thickness-thick{stroke-width:3.5px;}#mermaid-diagram-r2lrh .edge-pattern-solid{stroke-dasharray:0;}#mermaid-diagram-r2lrh .edge-thickness-invisible{stroke-width:0;fill:none;}#mermaid-diagram-r2lrh .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-diagram-r2lrh .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-diagram-r2lrh .marker{fill:#666;stroke:#666;}#mermaid-diagram-r2lrh .marker.cross{stroke:#666;}#mermaid-diagram-r2lrh svg{font-family:var(--font-geist-sans);font-size:12px;}#mermaid-diagram-r2lrh p{margin:0;}#mermaid-diagram-r2lrh .label{font-family:var(--font-geist-sans);color:#000000;}#mermaid-diagram-r2lrh .cluster-label text{fill:#333;}#mermaid-diagram-r2lrh .cluster-label span{color:#333;}#mermaid-diagram-r2lrh .cluster-label span p{background-color:transparent;}#mermaid-diagram-r2lrh .label text,#mermaid-diagram-r2lrh span{fill:#000000;color:#000000;}#mermaid-diagram-r2lrh .node rect,#mermaid-diagram-r2lrh .node circle,#mermaid-diagram-r2lrh .node ellipse,#mermaid-diagram-r2lrh .node polygon,#mermaid-diagram-r2lrh .node path{fill:#eee;stroke:#999;stroke-width:1px;}#mermaid-diagram-r2lrh .rough-node .label text,#mermaid-diagram-r2lrh .node .label text{text-anchor:middle;}#mermaid-diagram-r2lrh .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#mermaid-diagram-r2lrh .node .label{text-align:center;}#mermaid-diagram-r2lrh .node.clickable{cursor:pointer;}#mermaid-diagram-r2lrh .arrowheadPath{fill:#333333;}#mermaid-diagram-r2lrh .edgePath .path{stroke:#666;stroke-width:2.0px;}#mermaid-diagram-r2lrh .flowchart-link{stroke:#666;fill:none;}#mermaid-diagram-r2lrh .edgeLabel{background-color:white;text-align:center;}#mermaid-diagram-r2lrh .edgeLabel p{background-color:white;}#mermaid-diagram-r2lrh .edgeLabel rect{opacity:0.5;background-color:white;fill:white;}#mermaid-diagram-r2lrh .labelBkg{background-color:rgba(255, 255, 255, 0.5);}#mermaid-diagram-r2lrh .cluster rect{fill:hsl(0, 0%, 98.9215686275%);stroke:#707070;stroke-width:1px;}#mermaid-diagram-r2lrh .cluster text{fill:#333;}#mermaid-diagram-r2lrh .cluster span{color:#333;}#mermaid-diagram-r2lrh div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:var(--font-geist-sans);font-size:12px;background:hsl(-160, 0%, 93.3333333333%);border:1px solid #707070;border-radius:2px;pointer-events:none;z-index:100;}#mermaid-diagram-r2lrh .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#000000;}#mermaid-diagram-r2lrh .flowchart-link{stroke:hsl(var(--gray-400));stroke-width:1px;}#mermaid-diagram-r2lrh .marker,#mermaid-diagram-r2lrh marker,#mermaid-diagram-r2lrh marker *{fill:hsl(var(--gray-400))!important;stroke:hsl(var(--gray-400))!important;}#mermaid-diagram-r2lrh .label,#mermaid-diagram-r2lrh text,#mermaid-diagram-r2lrh text>tspan{fill:hsl(var(--black))!important;color:hsl(var(--black))!important;}#mermaid-diagram-r2lrh .background,#mermaid-diagram-r2lrh rect.relationshipLabelBox{fill:hsl(var(--white))!important;}#mermaid-diagram-r2lrh .entityBox,#mermaid-diagram-r2lrh .attributeBoxEven{fill:hsl(var(--gray-150))!important;}#mermaid-diagram-r2lrh .attributeBoxOdd{fill:hsl(var(--white))!important;}#mermaid-diagram-r2lrh .label-container,#mermaid-diagram-r2lrh rect.actor{fill:hsl(var(--white))!important;stroke:hsl(var(--gray-400))!important;}#mermaid-diagram-r2lrh line{stroke:hsl(var(--gray-400))!important;}#mermaid-diagram-r2lrh :root{--mermaid-font-family:var(--font-geist-sans);}Application MonolithiqueModules FonctionnelsHTTPSClient Web/MobileAPI Gateway / Load BalancerNoyau de l&#39;ApplicationModule AuthentificationModule UtilisateursModule CoursModule MessagerieModule NotesModule AbsencesModule Emploi du tempsModule RessourcesModule AnalytiqueModule NotificationsModule IABase de Données PrincipaleCache RedisStockage ObjetsFile de Tâches
+flowchart TD
+    Client["Client Web/Mobile"]
+    HTTPS["HTTPS"]
+    Gateway["API Gateway / Load Balancer"]
+
+    AppMono["Application Monolithique"]
+    ModulesFonc["Modules Fonctionnels"]
+
+    Noyau["Noyau de l'Application"]
+    ModAuth["Module Authentification"]
+    ModUsers["Module Utilisateurs"]
+    ModCours["Module Cours"]
+    ModMsg["Module Messagerie"]
+    ModNotes["Module Notes"]
+    ModAbs["Module Absences"]
+    ModEDT["Module Emploi du temps"]
+    ModRess["Module Ressources"]
+    ModAnal["Module Analytique"]
+    ModNotif["Module Notifications"]
+    ModIA["Module IA"]
+
+    DB["Base de Données Principale"]
+    Cache["Cache Redis"]
+    Storage["Stockage Objets"]
+    Queue["File de Tâches"]
+
+    Client --> HTTPS
+    HTTPS --> Gateway
+    Gateway --> AppMono
+
+    AppMono --> ModulesFonc
+    AppMono --> Noyau
+
+    ModulesFonc --> ModAuth
+    ModulesFonc --> ModUsers
+    ModulesFonc --> ModCours
+    ModulesFonc --> ModMsg
+    ModulesFonc --> ModNotes
+    ModulesFonc --> ModAbs
+    ModulesFonc --> ModEDT
+    ModulesFonc --> ModRess
+    ModulesFonc --> ModAnal
+    ModulesFonc --> ModNotif
+    ModulesFonc --> ModIA
+
+    AppMono --> DB
+    AppMono --> Cache
+    AppMono --> Storage
+    AppMono --> Queue
 ```
 
-## Structure du Code Monolithique Modulaire
+### Structure du Code Monolithique Modulaire
 
 ```mermaid
-Structure du Code Monolithique Modulaire.download-icon {
-            cursor: pointer;
-            transform-origin: center;
-        }
-        .download-icon .arrow-part {
-            transition: transform 0.35s cubic-bezier(0.35, 0.2, 0.14, 0.95);
-             transform-origin: center;
-        }
-        button:has(.download-icon):hover .download-icon .arrow-part, button:has(.download-icon):focus-visible .download-icon .arrow-part {
-          transform: translateY(-1.5px);
-        }
-        #mermaid-diagram-r2lrm{font-family:var(--font-geist-sans);font-size:12px;fill:#000000;}#mermaid-diagram-r2lrm .error-icon{fill:#552222;}#mermaid-diagram-r2lrm .error-text{fill:#552222;stroke:#552222;}#mermaid-diagram-r2lrm .edge-thickness-normal{stroke-width:1px;}#mermaid-diagram-r2lrm .edge-thickness-thick{stroke-width:3.5px;}#mermaid-diagram-r2lrm .edge-pattern-solid{stroke-dasharray:0;}#mermaid-diagram-r2lrm .edge-thickness-invisible{stroke-width:0;fill:none;}#mermaid-diagram-r2lrm .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-diagram-r2lrm .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-diagram-r2lrm .marker{fill:#666;stroke:#666;}#mermaid-diagram-r2lrm .marker.cross{stroke:#666;}#mermaid-diagram-r2lrm svg{font-family:var(--font-geist-sans);font-size:12px;}#mermaid-diagram-r2lrm p{margin:0;}#mermaid-diagram-r2lrm .label{font-family:var(--font-geist-sans);color:#000000;}#mermaid-diagram-r2lrm .cluster-label text{fill:#333;}#mermaid-diagram-r2lrm .cluster-label span{color:#333;}#mermaid-diagram-r2lrm .cluster-label span p{background-color:transparent;}#mermaid-diagram-r2lrm .label text,#mermaid-diagram-r2lrm span{fill:#000000;color:#000000;}#mermaid-diagram-r2lrm .node rect,#mermaid-diagram-r2lrm .node circle,#mermaid-diagram-r2lrm .node ellipse,#mermaid-diagram-r2lrm .node polygon,#mermaid-diagram-r2lrm .node path{fill:#eee;stroke:#999;stroke-width:1px;}#mermaid-diagram-r2lrm .rough-node .label text,#mermaid-diagram-r2lrm .node .label text{text-anchor:middle;}#mermaid-diagram-r2lrm .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#mermaid-diagram-r2lrm .node .label{text-align:center;}#mermaid-diagram-r2lrm .node.clickable{cursor:pointer;}#mermaid-diagram-r2lrm .arrowheadPath{fill:#333333;}#mermaid-diagram-r2lrm .edgePath .path{stroke:#666;stroke-width:2.0px;}#mermaid-diagram-r2lrm .flowchart-link{stroke:#666;fill:none;}#mermaid-diagram-r2lrm .edgeLabel{background-color:white;text-align:center;}#mermaid-diagram-r2lrm .edgeLabel p{background-color:white;}#mermaid-diagram-r2lrm .edgeLabel rect{opacity:0.5;background-color:white;fill:white;}#mermaid-diagram-r2lrm .labelBkg{background-color:rgba(255, 255, 255, 0.5);}#mermaid-diagram-r2lrm .cluster rect{fill:hsl(0, 0%, 98.9215686275%);stroke:#707070;stroke-width:1px;}#mermaid-diagram-r2lrm .cluster text{fill:#333;}#mermaid-diagram-r2lrm .cluster span{color:#333;}#mermaid-diagram-r2lrm div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:var(--font-geist-sans);font-size:12px;background:hsl(-160, 0%, 93.3333333333%);border:1px solid #707070;border-radius:2px;pointer-events:none;z-index:100;}#mermaid-diagram-r2lrm .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#000000;}#mermaid-diagram-r2lrm .flowchart-link{stroke:hsl(var(--gray-400));stroke-width:1px;}#mermaid-diagram-r2lrm .marker,#mermaid-diagram-r2lrm marker,#mermaid-diagram-r2lrm marker *{fill:hsl(var(--gray-400))!important;stroke:hsl(var(--gray-400))!important;}#mermaid-diagram-r2lrm .label,#mermaid-diagram-r2lrm text,#mermaid-diagram-r2lrm text>tspan{fill:hsl(var(--black))!important;color:hsl(var(--black))!important;}#mermaid-diagram-r2lrm .background,#mermaid-diagram-r2lrm rect.relationshipLabelBox{fill:hsl(var(--white))!important;}#mermaid-diagram-r2lrm .entityBox,#mermaid-diagram-r2lrm .attributeBoxEven{fill:hsl(var(--gray-150))!important;}#mermaid-diagram-r2lrm .attributeBoxOdd{fill:hsl(var(--white))!important;}#mermaid-diagram-r2lrm .label-container,#mermaid-diagram-r2lrm rect.actor{fill:hsl(var(--white))!important;stroke:hsl(var(--gray-400))!important;}#mermaid-diagram-r2lrm line{stroke:hsl(var(--gray-400))!important;}#mermaid-diagram-r2lrm :root{--mermaid-font-family:var(--font-geist-sans);}Structure d&#39;un ModuleControllersServicesRepositoriesModelsDTOsValidatorsEventsApplication EduConnectCoreModulesInfrastructureAPIConfigurationComposants CommunsSystème d&#39;ÉvénementsGestion d&#39;ExceptionsAuthUsersCoursesMessagingGradesAttendanceScheduleResourcesAnalyticsNotificationsAIDatabaseCachingStorageQueueEmailSMSLoggingControllersMiddlewareRoutesValidationDocumentation
+flowchart TD
+    AppEduConnect["Application EduConnect"]
+
+    Core["Core"]
+    Modules["Modules"]
+    Infrastructure["Infrastructure"]
+    API["API"]
+    Configuration["Configuration"]
+
+    Common["Composants Communs"]
+    EventSystem["Système d'Événements"]
+    ExceptionHandling["Gestion d'Exceptions"]
+
+    Auth["Auth"]
+    Users["Users"]
+    Courses["Courses"]
+    Messaging["Messaging"]
+    Grades["Grades"]
+    Attendance["Attendance"]
+    Schedule["Schedule"]
+    Resources["Resources"]
+    Analytics["Analytics"]
+    Notifications["Notifications"]
+    AI["AI"]
+
+    Database["Database"]
+    Caching["Caching"]
+    Storage["Storage"]
+    Queue["Queue"]
+    Email["Email"]
+    SMS["SMS"]
+    Logging["Logging"]
+
+    Controllers["Controllers"]
+    Middleware["Middleware"]
+    Routes["Routes"]
+    Validation["Validation"]
+    Documentation["Documentation"]
+
+    ModuleStruct["Structure d'un Module"]
+    ModControllers["Controllers"]
+    ModServices["Services"]
+    ModRepositories["Repositories"]
+    ModModels["Models"]
+    ModDTOs["DTOs"]
+    ModValidators["Validators"]
+    ModEvents["Events"]
+
+    AppEduConnect --> Core
+    AppEduConnect --> Modules
+    AppEduConnect --> Infrastructure
+    AppEduConnect --> API
+    AppEduConnect --> Configuration
+
+    Core --> Common
+    Core --> EventSystem
+    Core --> ExceptionHandling
+
+    Modules --> Auth
+    Modules --> Users
+    Modules --> Courses
+    Modules --> Messaging
+    Modules --> Grades
+    Modules --> Attendance
+    Modules --> Schedule
+    Modules --> Resources
+    Modules --> Analytics
+    Modules --> Notifications
+    Modules --> AI
+
+    Infrastructure --> Database
+    Infrastructure --> Caching
+    Infrastructure --> Storage
+    Infrastructure --> Queue
+    Infrastructure --> Email
+    Infrastructure --> SMS
+    Infrastructure --> Logging
+
+    API --> Controllers
+    API --> Middleware
+    API --> Routes
+    API --> Validation
+    API --> Documentation
+
+    Modules --> ModuleStruct
+    ModuleStruct --> ModControllers
+    ModuleStruct --> ModServices
+    ModuleStruct --> ModRepositories
+    ModuleStruct --> ModModels
+    ModuleStruct --> ModDTOs
+    ModuleStruct --> ModValidators
+    ModuleStruct --> ModEvents
 ```
 
-## Avantages de l'Architecture Monolithique Modulaire
+### Avantages de l'Architecture Monolithique Modulaire
 
 1. **Simplicité de développement**
 
-1. Base de code unique et cohérente
-2. Facilité de débogage et de test
-3. Courbe d'apprentissage plus douce pour les nouveaux développeurs
-
+    1. Base de code unique et cohérente
+    2. Facilité de débogage et de test
+    3. Courbe d'apprentissage plus douce pour les nouveaux développeurs
 
 2. **Modularité**
 
-1. Séparation claire des responsabilités
-2. Couplage faible entre les modules
-3. Possibilité de travailler sur des modules spécifiques
-
+    1. Séparation claire des responsabilités
+    2. Couplage faible entre les modules
+    3. Possibilité de travailler sur des modules spécifiques
 
 3. **Performance**
 
-1. Pas de latence due aux appels réseau entre services
-2. Optimisation des requêtes de base de données
-3. Gestion efficace de la mémoire
-
+    1. Pas de latence due aux appels réseau entre services
+    2. Optimisation des requêtes de base de données
+    3. Gestion efficace de la mémoire
 
 4. **Simplicité opérationnelle**
 
-1. Déploiement unique
-2. Surveillance et maintenance simplifiées
-3. Moins de complexité d'infrastructure
-
+    1. Déploiement unique
+    2. Surveillance et maintenance simplifiées
+    3. Moins de complexité d'infrastructure
 
 5. **Évolutivité**
 
-1. Possibilité d'extraire des modules en microservices à l'avenir
-2. Scaling vertical efficace pour les charges moyennes
-3. Possibilité de scaling horizontal avec plusieurs instances
+    1. Possibilité d'extraire des modules en microservices à l'avenir
+    2. Scaling vertical efficace pour les charges moyennes
+    3. Possibilité de scaling horizontal avec plusieurs instances
 
-## Infrastructure pour Monolithe Modulaire
-
-```mermaid
-Infrastructure pour Monolithe Modulaire.download-icon {
-            cursor: pointer;
-            transform-origin: center;
-        }
-        .download-icon .arrow-part {
-            transition: transform 0.35s cubic-bezier(0.35, 0.2, 0.14, 0.95);
-             transform-origin: center;
-        }
-        button:has(.download-icon):hover .download-icon .arrow-part, button:has(.download-icon):focus-visible .download-icon .arrow-part {
-          transform: translateY(-1.5px);
-        }
-        #mermaid-diagram-r2lua{font-family:var(--font-geist-sans);font-size:12px;fill:#000000;}#mermaid-diagram-r2lua .error-icon{fill:#552222;}#mermaid-diagram-r2lua .error-text{fill:#552222;stroke:#552222;}#mermaid-diagram-r2lua .edge-thickness-normal{stroke-width:1px;}#mermaid-diagram-r2lua .edge-thickness-thick{stroke-width:3.5px;}#mermaid-diagram-r2lua .edge-pattern-solid{stroke-dasharray:0;}#mermaid-diagram-r2lua .edge-thickness-invisible{stroke-width:0;fill:none;}#mermaid-diagram-r2lua .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-diagram-r2lua .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-diagram-r2lua .marker{fill:#666;stroke:#666;}#mermaid-diagram-r2lua .marker.cross{stroke:#666;}#mermaid-diagram-r2lua svg{font-family:var(--font-geist-sans);font-size:12px;}#mermaid-diagram-r2lua p{margin:0;}#mermaid-diagram-r2lua .label{font-family:var(--font-geist-sans);color:#000000;}#mermaid-diagram-r2lua .cluster-label text{fill:#333;}#mermaid-diagram-r2lua .cluster-label span{color:#333;}#mermaid-diagram-r2lua .cluster-label span p{background-color:transparent;}#mermaid-diagram-r2lua .label text,#mermaid-diagram-r2lua span{fill:#000000;color:#000000;}#mermaid-diagram-r2lua .node rect,#mermaid-diagram-r2lua .node circle,#mermaid-diagram-r2lua .node ellipse,#mermaid-diagram-r2lua .node polygon,#mermaid-diagram-r2lua .node path{fill:#eee;stroke:#999;stroke-width:1px;}#mermaid-diagram-r2lua .rough-node .label text,#mermaid-diagram-r2lua .node .label text{text-anchor:middle;}#mermaid-diagram-r2lua .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#mermaid-diagram-r2lua .node .label{text-align:center;}#mermaid-diagram-r2lua .node.clickable{cursor:pointer;}#mermaid-diagram-r2lua .arrowheadPath{fill:#333333;}#mermaid-diagram-r2lua .edgePath .path{stroke:#666;stroke-width:2.0px;}#mermaid-diagram-r2lua .flowchart-link{stroke:#666;fill:none;}#mermaid-diagram-r2lua .edgeLabel{background-color:white;text-align:center;}#mermaid-diagram-r2lua .edgeLabel p{background-color:white;}#mermaid-diagram-r2lua .edgeLabel rect{opacity:0.5;background-color:white;fill:white;}#mermaid-diagram-r2lua .labelBkg{background-color:rgba(255, 255, 255, 0.5);}#mermaid-diagram-r2lua .cluster rect{fill:hsl(0, 0%, 98.9215686275%);stroke:#707070;stroke-width:1px;}#mermaid-diagram-r2lua .cluster text{fill:#333;}#mermaid-diagram-r2lua .cluster span{color:#333;}#mermaid-diagram-r2lua div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:var(--font-geist-sans);font-size:12px;background:hsl(-160, 0%, 93.3333333333%);border:1px solid #707070;border-radius:2px;pointer-events:none;z-index:100;}#mermaid-diagram-r2lua .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#000000;}#mermaid-diagram-r2lua .flowchart-link{stroke:hsl(var(--gray-400));stroke-width:1px;}#mermaid-diagram-r2lua .marker,#mermaid-diagram-r2lua marker,#mermaid-diagram-r2lua marker *{fill:hsl(var(--gray-400))!important;stroke:hsl(var(--gray-400))!important;}#mermaid-diagram-r2lua .label,#mermaid-diagram-r2lua text,#mermaid-diagram-r2lua text>tspan{fill:hsl(var(--black))!important;color:hsl(var(--black))!important;}#mermaid-diagram-r2lua .background,#mermaid-diagram-r2lua rect.relationshipLabelBox{fill:hsl(var(--white))!important;}#mermaid-diagram-r2lua .entityBox,#mermaid-diagram-r2lua .attributeBoxEven{fill:hsl(var(--gray-150))!important;}#mermaid-diagram-r2lua .attributeBoxOdd{fill:hsl(var(--white))!important;}#mermaid-diagram-r2lua .label-container,#mermaid-diagram-r2lua rect.actor{fill:hsl(var(--white))!important;stroke:hsl(var(--gray-400))!important;}#mermaid-diagram-r2lua line{stroke:hsl(var(--gray-400))!important;}#mermaid-diagram-r2lua :root{--mermaid-font-family:var(--font-geist-sans);}Environnement de ProductionInternetCDNWeb Application FirewallLoad BalancerInstance App 1Instance App 2Instance App 3Base de Données PrimaireBase de Données RéplicaCache RedisStockage ObjetsFile de TâchesWorkersMonitoring &amp; AlertingCentralisation LogsSystème de Backup
-```
-
-## Architecture de Base de Données
+### Infrastructure pour Monolithe Modulaire
 
 ```mermaid
-Architecture de Base de Données.download-icon {
-            cursor: pointer;
-            transform-origin: center;
-        }
-        .download-icon .arrow-part {
-            transition: transform 0.35s cubic-bezier(0.35, 0.2, 0.14, 0.95);
-             transform-origin: center;
-        }
-        button:has(.download-icon):hover .download-icon .arrow-part, button:has(.download-icon):focus-visible .download-icon .arrow-part {
-          transform: translateY(-1.5px);
-        }
-        #mermaid-diagram-r2luf{font-family:var(--font-geist-sans);font-size:12px;fill:#000000;}#mermaid-diagram-r2luf .error-icon{fill:#552222;}#mermaid-diagram-r2luf .error-text{fill:#552222;stroke:#552222;}#mermaid-diagram-r2luf .edge-thickness-normal{stroke-width:1px;}#mermaid-diagram-r2luf .edge-thickness-thick{stroke-width:3.5px;}#mermaid-diagram-r2luf .edge-pattern-solid{stroke-dasharray:0;}#mermaid-diagram-r2luf .edge-thickness-invisible{stroke-width:0;fill:none;}#mermaid-diagram-r2luf .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-diagram-r2luf .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-diagram-r2luf .marker{fill:#666;stroke:#666;}#mermaid-diagram-r2luf .marker.cross{stroke:#666;}#mermaid-diagram-r2luf svg{font-family:var(--font-geist-sans);font-size:12px;}#mermaid-diagram-r2luf p{margin:0;}#mermaid-diagram-r2luf .label{font-family:var(--font-geist-sans);color:#000000;}#mermaid-diagram-r2luf .cluster-label text{fill:#333;}#mermaid-diagram-r2luf .cluster-label span{color:#333;}#mermaid-diagram-r2luf .cluster-label span p{background-color:transparent;}#mermaid-diagram-r2luf .label text,#mermaid-diagram-r2luf span{fill:#000000;color:#000000;}#mermaid-diagram-r2luf .node rect,#mermaid-diagram-r2luf .node circle,#mermaid-diagram-r2luf .node ellipse,#mermaid-diagram-r2luf .node polygon,#mermaid-diagram-r2luf .node path{fill:#eee;stroke:#999;stroke-width:1px;}#mermaid-diagram-r2luf .rough-node .label text,#mermaid-diagram-r2luf .node .label text{text-anchor:middle;}#mermaid-diagram-r2luf .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#mermaid-diagram-r2luf .node .label{text-align:center;}#mermaid-diagram-r2luf .node.clickable{cursor:pointer;}#mermaid-diagram-r2luf .arrowheadPath{fill:#333333;}#mermaid-diagram-r2luf .edgePath .path{stroke:#666;stroke-width:2.0px;}#mermaid-diagram-r2luf .flowchart-link{stroke:#666;fill:none;}#mermaid-diagram-r2luf .edgeLabel{background-color:white;text-align:center;}#mermaid-diagram-r2luf .edgeLabel p{background-color:white;}#mermaid-diagram-r2luf .edgeLabel rect{opacity:0.5;background-color:white;fill:white;}#mermaid-diagram-r2luf .labelBkg{background-color:rgba(255, 255, 255, 0.5);}#mermaid-diagram-r2luf .cluster rect{fill:hsl(0, 0%, 98.9215686275%);stroke:#707070;stroke-width:1px;}#mermaid-diagram-r2luf .cluster text{fill:#333;}#mermaid-diagram-r2luf .cluster span{color:#333;}#mermaid-diagram-r2luf div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:var(--font-geist-sans);font-size:12px;background:hsl(-160, 0%, 93.3333333333%);border:1px solid #707070;border-radius:2px;pointer-events:none;z-index:100;}#mermaid-diagram-r2luf .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#000000;}#mermaid-diagram-r2luf .flowchart-link{stroke:hsl(var(--gray-400));stroke-width:1px;}#mermaid-diagram-r2luf .marker,#mermaid-diagram-r2luf marker,#mermaid-diagram-r2luf marker *{fill:hsl(var(--gray-400))!important;stroke:hsl(var(--gray-400))!important;}#mermaid-diagram-r2luf .label,#mermaid-diagram-r2luf text,#mermaid-diagram-r2luf text>tspan{fill:hsl(var(--black))!important;color:hsl(var(--black))!important;}#mermaid-diagram-r2luf .background,#mermaid-diagram-r2luf rect.relationshipLabelBox{fill:hsl(var(--white))!important;}#mermaid-diagram-r2luf .entityBox,#mermaid-diagram-r2luf .attributeBoxEven{fill:hsl(var(--gray-150))!important;}#mermaid-diagram-r2luf .attributeBoxOdd{fill:hsl(var(--white))!important;}#mermaid-diagram-r2luf .label-container,#mermaid-diagram-r2luf rect.actor{fill:hsl(var(--white))!important;stroke:hsl(var(--gray-400))!important;}#mermaid-diagram-r2luf line{stroke:hsl(var(--gray-400))!important;}#mermaid-diagram-r2luf :root{--mermaid-font-family:var(--font-geist-sans);}Base de Données PrincipaleUtilisateursRôlesPermissionsÉtablissementsClassesMatièresCoursLeçonsDevoirsRendusNotesPrésencesMessagesRessourcesEmploi du tempsNotificationsDonnées AnalytiquesParamètresLogs Système
+flowchart TD
+    EnvProd["Environnement de Production"]
+    Internet["Internet"]
+    CDN["CDN"]
+    WAF["Web Application Firewall"]
+    LoadBalancer["Load Balancer"]
+
+    App1["Instance App 1"]
+    App2["Instance App 2"]
+    App3["Instance App 3"]
+
+    DBPrimary["Base de Données Primaire"]
+    DBReplica["Base de Données Réplica"]
+    Cache["Cache Redis"]
+    Storage["Stockage Objets"]
+    Queue["File de Tâches"]
+    Workers["Workers"]
+
+    Monitoring["Monitoring & Alerting"]
+    Logs["Centralisation Logs"]
+    Backup["Système de Backup"]
+
+    EnvProd --> Internet
+    Internet --> CDN
+    CDN --> WAF
+    WAF --> LoadBalancer
+
+    LoadBalancer --> App1
+    LoadBalancer --> App2
+    LoadBalancer --> App3
+
+    App1 --> DBPrimary
+    App2 --> DBPrimary
+    App3 --> DBPrimary
+
+    DBPrimary --> DBReplica
+
+    App1 --> Cache
+    App2 --> Cache
+    App3 --> Cache
+
+    App1 --> Storage
+    App2 --> Storage
+    App3 --> Storage
+
+    App1 --> Queue
+    App2 --> Queue
+    App3 --> Queue
+
+    Queue --> Workers
+
+    App1 --> Monitoring
+    App2 --> Monitoring
+    App3 --> Monitoring
+    DBPrimary --> Monitoring
+    Queue --> Monitoring
+    Workers --> Monitoring
+
+    App1 --> Logs
+    App2 --> Logs
+    App3 --> Logs
+    DBPrimary --> Logs
+    Queue --> Logs
+    Workers --> Logs
+
+    DBPrimary --> Backup
+    Storage --> Backup
 ```
 
-## Stratégie de Déploiement
+### Architecture de Base de Données
 
 ```mermaid
-Stratégie de Déploiement.download-icon {
-            cursor: pointer;
-            transform-origin: center;
-        }
-        .download-icon .arrow-part {
-            transition: transform 0.35s cubic-bezier(0.35, 0.2, 0.14, 0.95);
-             transform-origin: center;
-        }
-        button:has(.download-icon):hover .download-icon .arrow-part, button:has(.download-icon):focus-visible .download-icon .arrow-part {
-          transform: translateY(-1.5px);
-        }
-        #mermaid-diagram-r2luk{font-family:var(--font-geist-sans);font-size:12px;fill:#000000;}#mermaid-diagram-r2luk .error-icon{fill:#552222;}#mermaid-diagram-r2luk .error-text{fill:#552222;stroke:#552222;}#mermaid-diagram-r2luk .edge-thickness-normal{stroke-width:1px;}#mermaid-diagram-r2luk .edge-thickness-thick{stroke-width:3.5px;}#mermaid-diagram-r2luk .edge-pattern-solid{stroke-dasharray:0;}#mermaid-diagram-r2luk .edge-thickness-invisible{stroke-width:0;fill:none;}#mermaid-diagram-r2luk .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-diagram-r2luk .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-diagram-r2luk .marker{fill:#666;stroke:#666;}#mermaid-diagram-r2luk .marker.cross{stroke:#666;}#mermaid-diagram-r2luk svg{font-family:var(--font-geist-sans);font-size:12px;}#mermaid-diagram-r2luk p{margin:0;}#mermaid-diagram-r2luk .label{font-family:var(--font-geist-sans);color:#000000;}#mermaid-diagram-r2luk .cluster-label text{fill:#333;}#mermaid-diagram-r2luk .cluster-label span{color:#333;}#mermaid-diagram-r2luk .cluster-label span p{background-color:transparent;}#mermaid-diagram-r2luk .label text,#mermaid-diagram-r2luk span{fill:#000000;color:#000000;}#mermaid-diagram-r2luk .node rect,#mermaid-diagram-r2luk .node circle,#mermaid-diagram-r2luk .node ellipse,#mermaid-diagram-r2luk .node polygon,#mermaid-diagram-r2luk .node path{fill:#eee;stroke:#999;stroke-width:1px;}#mermaid-diagram-r2luk .rough-node .label text,#mermaid-diagram-r2luk .node .label text{text-anchor:middle;}#mermaid-diagram-r2luk .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#mermaid-diagram-r2luk .node .label{text-align:center;}#mermaid-diagram-r2luk .node.clickable{cursor:pointer;}#mermaid-diagram-r2luk .arrowheadPath{fill:#333333;}#mermaid-diagram-r2luk .edgePath .path{stroke:#666;stroke-width:2.0px;}#mermaid-diagram-r2luk .flowchart-link{stroke:#666;fill:none;}#mermaid-diagram-r2luk .edgeLabel{background-color:white;text-align:center;}#mermaid-diagram-r2luk .edgeLabel p{background-color:white;}#mermaid-diagram-r2luk .edgeLabel rect{opacity:0.5;background-color:white;fill:white;}#mermaid-diagram-r2luk .labelBkg{background-color:rgba(255, 255, 255, 0.5);}#mermaid-diagram-r2luk .cluster rect{fill:hsl(0, 0%, 98.9215686275%);stroke:#707070;stroke-width:1px;}#mermaid-diagram-r2luk .cluster text{fill:#333;}#mermaid-diagram-r2luk .cluster span{color:#333;}#mermaid-diagram-r2luk div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:var(--font-geist-sans);font-size:12px;background:hsl(-160, 0%, 93.3333333333%);border:1px solid #707070;border-radius:2px;pointer-events:none;z-index:100;}#mermaid-diagram-r2luk .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#000000;}#mermaid-diagram-r2luk .flowchart-link{stroke:hsl(var(--gray-400));stroke-width:1px;}#mermaid-diagram-r2luk .marker,#mermaid-diagram-r2luk marker,#mermaid-diagram-r2luk marker *{fill:hsl(var(--gray-400))!important;stroke:hsl(var(--gray-400))!important;}#mermaid-diagram-r2luk .label,#mermaid-diagram-r2luk text,#mermaid-diagram-r2luk text>tspan{fill:hsl(var(--black))!important;color:hsl(var(--black))!important;}#mermaid-diagram-r2luk .background,#mermaid-diagram-r2luk rect.relationshipLabelBox{fill:hsl(var(--white))!important;}#mermaid-diagram-r2luk .entityBox,#mermaid-diagram-r2luk .attributeBoxEven{fill:hsl(var(--gray-150))!important;}#mermaid-diagram-r2luk .attributeBoxOdd{fill:hsl(var(--white))!important;}#mermaid-diagram-r2luk .label-container,#mermaid-diagram-r2luk rect.actor{fill:hsl(var(--white))!important;stroke:hsl(var(--gray-400))!important;}#mermaid-diagram-r2luk line{stroke:hsl(var(--gray-400))!important;}#mermaid-diagram-r2luk :root{--mermaid-font-family:var(--font-geist-sans);}EnvironnementsRepository GitCI PipelineDéveloppementTestPré-productionProductionBuildTests UnitairesTests d&#39;IntégrationScan de SécuritéDéploiement DevDéploiement TestDéploiement StagingDéploiement ProductionMonitoringRollback si nécessaire
+flowchart TD
+    DBPrincipale["Base de Données Principale"]
+
+    Users["Utilisateurs"]
+    Roles["Rôles"]
+    Permissions["Permissions"]
+    Etablissements["Établissements"]
+    Classes["Classes"]
+    Matieres["Matières"]
+    Cours["Cours"]
+    Lecons["Leçons"]
+    Devoirs["Devoirs"]
+    Rendus["Rendus"]
+    Notes["Notes"]
+    Presences["Présences"]
+    Messages["Messages"]
+    Ressources["Ressources"]
+    EDT["Emploi du temps"]
+    Notifications["Notifications"]
+    Analytics["Données Analytiques"]
+    Params["Paramètres"]
+    SystemLogs["Logs Système"]
+
+    DBPrincipale --> Users
+    DBPrincipale --> Roles
+    DBPrincipale --> Permissions
+    DBPrincipale --> Etablissements
+    DBPrincipale --> Classes
+    DBPrincipale --> Matieres
+    DBPrincipale --> Cours
+    DBPrincipale --> Lecons
+    DBPrincipale --> Devoirs
+    DBPrincipale --> Rendus
+    DBPrincipale --> Notes
+    DBPrincipale --> Presences
+    DBPrincipale --> Messages
+    DBPrincipale --> Ressources
+    DBPrincipale --> EDT
+    DBPrincipale --> Notifications
+    DBPrincipale --> Analytics
+    DBPrincipale --> Params
+    DBPrincipale --> SystemLogs
 ```
 
-## Considérations Techniques Spécifiques
-
-### 1. Choix Technologiques
+### Stratégie de Déploiement
 
 ```mermaid
-Stack Technologique.download-icon {
-            cursor: pointer;
-            transform-origin: center;
-        }
-        .download-icon .arrow-part {
-            transition: transform 0.35s cubic-bezier(0.35, 0.2, 0.14, 0.95);
-             transform-origin: center;
-        }
-        button:has(.download-icon):hover .download-icon .arrow-part, button:has(.download-icon):focus-visible .download-icon .arrow-part {
-          transform: translateY(-1.5px);
-        }
-        #mermaid-diagram-r2lus{font-family:var(--font-geist-sans);font-size:12px;fill:#000000;}#mermaid-diagram-r2lus .error-icon{fill:#552222;}#mermaid-diagram-r2lus .error-text{fill:#552222;stroke:#552222;}#mermaid-diagram-r2lus .edge-thickness-normal{stroke-width:1px;}#mermaid-diagram-r2lus .edge-thickness-thick{stroke-width:3.5px;}#mermaid-diagram-r2lus .edge-pattern-solid{stroke-dasharray:0;}#mermaid-diagram-r2lus .edge-thickness-invisible{stroke-width:0;fill:none;}#mermaid-diagram-r2lus .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-diagram-r2lus .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-diagram-r2lus .marker{fill:#666;stroke:#666;}#mermaid-diagram-r2lus .marker.cross{stroke:#666;}#mermaid-diagram-r2lus svg{font-family:var(--font-geist-sans);font-size:12px;}#mermaid-diagram-r2lus p{margin:0;}#mermaid-diagram-r2lus .label{font-family:var(--font-geist-sans);color:#000000;}#mermaid-diagram-r2lus .cluster-label text{fill:#333;}#mermaid-diagram-r2lus .cluster-label span{color:#333;}#mermaid-diagram-r2lus .cluster-label span p{background-color:transparent;}#mermaid-diagram-r2lus .label text,#mermaid-diagram-r2lus span{fill:#000000;color:#000000;}#mermaid-diagram-r2lus .node rect,#mermaid-diagram-r2lus .node circle,#mermaid-diagram-r2lus .node ellipse,#mermaid-diagram-r2lus .node polygon,#mermaid-diagram-r2lus .node path{fill:#eee;stroke:#999;stroke-width:1px;}#mermaid-diagram-r2lus .rough-node .label text,#mermaid-diagram-r2lus .node .label text{text-anchor:middle;}#mermaid-diagram-r2lus .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#mermaid-diagram-r2lus .node .label{text-align:center;}#mermaid-diagram-r2lus .node.clickable{cursor:pointer;}#mermaid-diagram-r2lus .arrowheadPath{fill:#333333;}#mermaid-diagram-r2lus .edgePath .path{stroke:#666;stroke-width:2.0px;}#mermaid-diagram-r2lus .flowchart-link{stroke:#666;fill:none;}#mermaid-diagram-r2lus .edgeLabel{background-color:white;text-align:center;}#mermaid-diagram-r2lus .edgeLabel p{background-color:white;}#mermaid-diagram-r2lus .edgeLabel rect{opacity:0.5;background-color:white;fill:white;}#mermaid-diagram-r2lus .labelBkg{background-color:rgba(255, 255, 255, 0.5);}#mermaid-diagram-r2lus .cluster rect{fill:hsl(0, 0%, 98.9215686275%);stroke:#707070;stroke-width:1px;}#mermaid-diagram-r2lus .cluster text{fill:#333;}#mermaid-diagram-r2lus .cluster span{color:#333;}#mermaid-diagram-r2lus div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:var(--font-geist-sans);font-size:12px;background:hsl(-160, 0%, 93.3333333333%);border:1px solid #707070;border-radius:2px;pointer-events:none;z-index:100;}#mermaid-diagram-r2lus .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#000000;}#mermaid-diagram-r2lus .flowchart-link{stroke:hsl(var(--gray-400));stroke-width:1px;}#mermaid-diagram-r2lus .marker,#mermaid-diagram-r2lus marker,#mermaid-diagram-r2lus marker *{fill:hsl(var(--gray-400))!important;stroke:hsl(var(--gray-400))!important;}#mermaid-diagram-r2lus .label,#mermaid-diagram-r2lus text,#mermaid-diagram-r2lus text>tspan{fill:hsl(var(--black))!important;color:hsl(var(--black))!important;}#mermaid-diagram-r2lus .background,#mermaid-diagram-r2lus rect.relationshipLabelBox{fill:hsl(var(--white))!important;}#mermaid-diagram-r2lus .entityBox,#mermaid-diagram-r2lus .attributeBoxEven{fill:hsl(var(--gray-150))!important;}#mermaid-diagram-r2lus .attributeBoxOdd{fill:hsl(var(--white))!important;}#mermaid-diagram-r2lus .label-container,#mermaid-diagram-r2lus rect.actor{fill:hsl(var(--white))!important;stroke:hsl(var(--gray-400))!important;}#mermaid-diagram-r2lus line{stroke:hsl(var(--gray-400))!important;}#mermaid-diagram-r2lus :root{--mermaid-font-family:var(--font-geist-sans);}BackendBase de DonnéesCacheFile de TâchesStockageNode.jsExpress.jsTypeScriptPostgreSQLRedisBullS3 Compatible
+flowchart TD
+    Repository["Repository Git"]
+    CIPipeline["CI Pipeline"]
+
+    Dev["Développement"]
+    Test["Test"]
+    Staging["Pré-production"]
+    Prod["Production"]
+
+    Build["Build"]
+    TestsUnit["Tests Unitaires"]
+    TestsInteg["Tests d'Intégration"]
+    ScanSecu["Scan de Sécurité"]
+
+    DeployDev["Déploiement Dev"]
+    DeployTest["Déploiement Test"]
+    DeployStaging["Déploiement Staging"]
+    DeployProd["Déploiement Production"]
+
+    Monitoring["Monitoring"]
+    Rollback["Rollback si nécessaire"]
+
+    Repository --> CIPipeline
+    CIPipeline --> Build
+    Build --> TestsUnit
+    TestsUnit --> TestsInteg
+    TestsInteg --> ScanSecu
+
+    ScanSecu --> DeployDev
+    DeployDev --> Dev
+
+    Dev --> DeployTest
+    DeployTest --> Test
+
+    Test --> DeployStaging
+    DeployStaging --> Staging
+
+    Staging --> DeployProd
+    DeployProd --> Prod
+
+    Prod --> Monitoring
+    Monitoring --> Rollback
+    Rollback --> Repository
 ```
 
-### 2. Optimisations pour le Contexte Africain
+### Considérations Techniques Spécifiques
+
+#### 1. Choix Technologiques
+
+```mermaid
+flowchart TD
+    Backend["Backend"]
+    DB["Base de Données"]
+    Cache["Cache"]
+    Queue["File de Tâches"]
+    Storage["Stockage"]
+
+    NodeJS["Node.js"]
+    ExpressJS["Express.js"]
+    TypeScript["TypeScript"]
+    PostgreSQL["PostgreSQL"]
+    Redis["Redis"]
+    Bull["Bull"]
+    S3["S3 Compatible"]
+
+    Backend --> NodeJS
+    Backend --> ExpressJS
+    Backend --> TypeScript
+
+    DB --> PostgreSQL
+
+    Cache --> Redis
+
+    Queue --> Bull
+
+    Storage --> S3
+```
+
+#### 2. Optimisations pour le Contexte Africain
 
 1. **Performance avec Connexion Limitée**
 
-1. Compression des réponses API
-2. Mise en cache agressive
-3. Pagination optimisée des résultats
-4. API endpoints optimisés pour minimiser les données transférées
-
+    1. Compression des réponses API
+    2. Mise en cache agressive
+    3. Pagination optimisée des résultats
+    4. API endpoints optimisés pour minimiser les données transférées
 
 2. **Résilience aux Coupures**
 
-1. Transactions robustes avec retry patterns
-2. Mécanismes de reprise après échec
-3. Journalisation détaillée pour récupération
-
+    1. Transactions robustes avec retry patterns
+    2. Mécanismes de reprise après échec
+    3. Journalisation détaillée pour récupération
 
 3. **Optimisation des Ressources**
 
-1. Utilisation efficace de la mémoire
-2. Pooling de connexions à la base de données
-3. Gestion optimisée des assets
+    1. Utilisation efficace de la mémoire
+    2. Pooling de connexions à la base de données
+    3. Gestion optimisée des assets
 
-### 3. Sécurité
+#### 3. Sécurité
 
 ```mermaid
-Architecture de Sécurité.download-icon {
-            cursor: pointer;
-            transform-origin: center;
-        }
-        .download-icon .arrow-part {
-            transition: transform 0.35s cubic-bezier(0.35, 0.2, 0.14, 0.95);
-             transform-origin: center;
-        }
-        button:has(.download-icon):hover .download-icon .arrow-part, button:has(.download-icon):focus-visible .download-icon .arrow-part {
-          transform: translateY(-1.5px);
-        }
-        #mermaid-diagram-r2m0l{font-family:var(--font-geist-sans);font-size:12px;fill:#000000;}#mermaid-diagram-r2m0l .error-icon{fill:#552222;}#mermaid-diagram-r2m0l .error-text{fill:#552222;stroke:#552222;}#mermaid-diagram-r2m0l .edge-thickness-normal{stroke-width:1px;}#mermaid-diagram-r2m0l .edge-thickness-thick{stroke-width:3.5px;}#mermaid-diagram-r2m0l .edge-pattern-solid{stroke-dasharray:0;}#mermaid-diagram-r2m0l .edge-thickness-invisible{stroke-width:0;fill:none;}#mermaid-diagram-r2m0l .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-diagram-r2m0l .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-diagram-r2m0l .marker{fill:#666;stroke:#666;}#mermaid-diagram-r2m0l .marker.cross{stroke:#666;}#mermaid-diagram-r2m0l svg{font-family:var(--font-geist-sans);font-size:12px;}#mermaid-diagram-r2m0l p{margin:0;}#mermaid-diagram-r2m0l .label{font-family:var(--font-geist-sans);color:#000000;}#mermaid-diagram-r2m0l .cluster-label text{fill:#333;}#mermaid-diagram-r2m0l .cluster-label span{color:#333;}#mermaid-diagram-r2m0l .cluster-label span p{background-color:transparent;}#mermaid-diagram-r2m0l .label text,#mermaid-diagram-r2m0l span{fill:#000000;color:#000000;}#mermaid-diagram-r2m0l .node rect,#mermaid-diagram-r2m0l .node circle,#mermaid-diagram-r2m0l .node ellipse,#mermaid-diagram-r2m0l .node polygon,#mermaid-diagram-r2m0l .node path{fill:#eee;stroke:#999;stroke-width:1px;}#mermaid-diagram-r2m0l .rough-node .label text,#mermaid-diagram-r2m0l .node .label text{text-anchor:middle;}#mermaid-diagram-r2m0l .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#mermaid-diagram-r2m0l .node .label{text-align:center;}#mermaid-diagram-r2m0l .node.clickable{cursor:pointer;}#mermaid-diagram-r2m0l .arrowheadPath{fill:#333333;}#mermaid-diagram-r2m0l .edgePath .path{stroke:#666;stroke-width:2.0px;}#mermaid-diagram-r2m0l .flowchart-link{stroke:#666;fill:none;}#mermaid-diagram-r2m0l .edgeLabel{background-color:white;text-align:center;}#mermaid-diagram-r2m0l .edgeLabel p{background-color:white;}#mermaid-diagram-r2m0l .edgeLabel rect{opacity:0.5;background-color:white;fill:white;}#mermaid-diagram-r2m0l .labelBkg{background-color:rgba(255, 255, 255, 0.5);}#mermaid-diagram-r2m0l .cluster rect{fill:hsl(0, 0%, 98.9215686275%);stroke:#707070;stroke-width:1px;}#mermaid-diagram-r2m0l .cluster text{fill:#333;}#mermaid-diagram-r2m0l .cluster span{color:#333;}#mermaid-diagram-r2m0l div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:var(--font-geist-sans);font-size:12px;background:hsl(-160, 0%, 93.3333333333%);border:1px solid #707070;border-radius:2px;pointer-events:none;z-index:100;}#mermaid-diagram-r2m0l .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#000000;}#mermaid-diagram-r2m0l .flowchart-link{stroke:hsl(var(--gray-400));stroke-width:1px;}#mermaid-diagram-r2m0l .marker,#mermaid-diagram-r2m0l marker,#mermaid-diagram-r2m0l marker *{fill:hsl(var(--gray-400))!important;stroke:hsl(var(--gray-400))!important;}#mermaid-diagram-r2m0l .label,#mermaid-diagram-r2m0l text,#mermaid-diagram-r2m0l text>tspan{fill:hsl(var(--black))!important;color:hsl(var(--black))!important;}#mermaid-diagram-r2m0l .background,#mermaid-diagram-r2m0l rect.relationshipLabelBox{fill:hsl(var(--white))!important;}#mermaid-diagram-r2m0l .entityBox,#mermaid-diagram-r2m0l .attributeBoxEven{fill:hsl(var(--gray-150))!important;}#mermaid-diagram-r2m0l .attributeBoxOdd{fill:hsl(var(--white))!important;}#mermaid-diagram-r2m0l .label-container,#mermaid-diagram-r2m0l rect.actor{fill:hsl(var(--white))!important;stroke:hsl(var(--gray-400))!important;}#mermaid-diagram-r2m0l line{stroke:hsl(var(--gray-400))!important;}#mermaid-diagram-r2m0l :root{--mermaid-font-family:var(--font-geist-sans);}SécuritéAuthentificationJWTSessionsMulti-facteurAutorisationRBACPolitiquesProtection des DonnéesChiffrementMasquageAnonymisationProtection APIRate LimitingCORSCSPConformitéRGPDProtection des MineursLois Locales
+flowchart TD
+    Securite["Sécurité"]
+
+    Auth["Authentification"]
+    JWT["JWT"]
+    Sessions["Sessions"]
+    MFA["Multi-facteur"]
+
+    Authorization["Autorisation"]
+    RBAC["RBAC"]
+    Policies["Politiques"]
+
+    DataProtection["Protection des Données"]
+    Encryption["Chiffrement"]
+    Masking["Masquage"]
+    Anonymization["Anonymisation"]
+
+    APIProtection["Protection API"]
+    RateLimiting["Rate Limiting"]
+    CORS["CORS"]
+    CSP["CSP"]
+
+    Compliance["Conformité"]
+    RGPD["RGPD"]
+    ChildProtection["Protection des Mineurs"]
+    LocalLaws["Lois Locales"]
+
+    Securite --> Auth
+    Securite --> Authorization
+    Securite --> DataProtection
+    Securite --> APIProtection
+    Securite --> Compliance
+
+    Auth --> JWT
+    Auth --> Sessions
+    Auth --> MFA
+
+    Authorization --> RBAC
+    Authorization --> Policies
+
+    DataProtection --> Encryption
+    DataProtection --> Masking
+    DataProtection --> Anonymization
+
+    APIProtection --> RateLimiting
+    APIProtection --> CORS
+    APIProtection --> CSP
+
+    Compliance --> RGPD
+    Compliance --> ChildProtection
+    Compliance --> LocalLaws
 ```
 
-## Plan de Mise à l'Échelle
+### Plan de Mise à l'Échelle
 
 1. **Phase Initiale**
 
-1. Monolithe unique avec base de données unique
-2. Déploiement sur serveur unique ou petit cluster
-3. Focus sur la stabilité et les fonctionnalités de base
-
+    1. Monolithe unique avec base de données unique
+    2. Déploiement sur serveur unique ou petit cluster
+    3. Focus sur la stabilité et les fonctionnalités de base
 
 2. **Phase de Croissance**
 
-1. Scaling vertical du monolithe (plus de CPU/RAM)
-2. Réplication de la base de données
-3. Ajout de cache Redis
-4. Optimisation des requêtes et indexes
-
+    1. Scaling vertical du monolithe (plus de CPU/RAM)
+    2. Réplication de la base de données
+    3. Ajout de cache Redis
+    4. Optimisation des requêtes et indexes
 
 3. **Phase d'Expansion**
 
-1. Multiple instances du monolithe derrière un load balancer
-2. Séparation des workers pour les tâches en arrière-plan
-3. Sharding potentiel de la base de données
-4. CDN pour les assets statiques
-
+    1. Multiple instances du monolithe derrière un load balancer
+    2. Séparation des workers pour les tâches en arrière-plan
+    3. Sharding potentiel de la base de données
+    4. CDN pour les assets statiques
 
 4. **Phase de Maturité**
 
-1. Extraction potentielle de certains modules en services séparés
-2. Architecture hybride monolithe/microservices
-3. Optimisation fine basée sur les métriques d'utilisation
-4. Infrastructure multi-régions si nécessaire
+    1. Extraction potentielle de certains modules en services séparés
+    2. Architecture hybride monolithe/microservices
+    3. Optimisation fine basée sur les métriques d'utilisation
+    4. Infrastructure multi-régions si nécessaire
 
-## Avantages de cette Approche pour EduConnect
+### Avantages de cette Approche pour EduConnect
 
 1. **Rapidité de développement initial**
 
-1. Mise sur le marché plus rapide
-2. Moins de complexité d'infrastructure à gérer
-
+    1. Mise sur le marché plus rapide
+    2. Moins de complexité d'infrastructure à gérer
 
 2. **Coûts d'infrastructure réduits**
 
-1. Ressources serveur optimisées
-2. Moins de composants à maintenir
-
+    1. Ressources serveur optimisées
+    2. Moins de composants à maintenir
 
 3. **Simplicité opérationnelle**
 
-1. Déploiements plus simples
-2. Monitoring unifié
-3. Débogage plus facile
-
+    1. Déploiements plus simples
+    2. Monitoring unifié
+    3. Débogage plus facile
 
 4. **Adaptabilité au contexte africain**
 
-1. Performance optimisée pour les connexions limitées
-2. Résilience aux problèmes d'infrastructure
-3. Coûts d'hébergement maîtrisés
-
+    1. Performance optimisée pour les connexions limitées
+    2. Résilience aux problèmes d'infrastructure
+    3. Coûts d'hébergement maîtrisés
 
 5. **Évolutivité progressive**
 
-1. Possibilité d'évoluer vers une architecture plus distribuée à mesure que la plateforme se développe
-2. Extraction de modules spécifiques en services indépendants selon les besoins
+    1. Possibilité d'évoluer vers une architecture plus distribuée à mesure que la plateforme se développe
+    2. Extraction de modules spécifiques en services indépendants selon les besoins
 
 Cette architecture monolithique modulaire offre un bon équilibre entre simplicité, performance et évolutivité, tout en
 étant particulièrement adaptée au contexte africain et aux besoins d'EduConnect.
