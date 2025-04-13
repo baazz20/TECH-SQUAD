@@ -16,7 +16,7 @@
 
 | Column         | Type         | Description                                           |
 |----------------|--------------|-------------------------------------------------------|
-| id             | INT          | Primary Key                                           |
+| id             | INT          | Primary Key (UUID)                                          |
 | first_name     | VARCHAR(30)  | Nom de l'utilisateur                                  |
 | last_name      | VARCHAR(30)  | Nom de l'utilisateur                                  |
 | email          | VARCHAR(100) | Email (unique)                                        |
