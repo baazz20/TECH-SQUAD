@@ -21,7 +21,7 @@
 | last_name      | VARCHAR(30)  | Nom de l'utilisateur                                  |
 | email          | VARCHAR(100) | Email (unique)                                        |
 | password       | VARCHAR(255) | Mot de passe                                          |
-| role           | ENUM('student', 'teacher', 'parent', 'admin') | Rôle de l'utilisateur (élève, enseignant, parent) |
+| role_id           | ENUM('student', 'teacher', 'parent', 'admin') | Rôle de l'utilisateur (élève, enseignant, parent) |
 | created_at     | TIMESTAMP    | Date de création                                      |
 | updated_at     | TIMESTAMP    | Date de dernière mise à jour                          |
 
